@@ -16,8 +16,6 @@
 # in this script we take into account the grouping of herbivores
 # into FUNCTIONAL GROUPS (sensu Speed et al 2019)
 
-rm(list=ls())
-
 # libraries----
 library(data.table)
 library(tidyverse)
@@ -62,25 +60,18 @@ hp(n = 15, house = "Ravenclaw")[15] # colour for positive effects
 
  
 # load data --------------------------------------------------------------------
+# clean the environment first
+rm(list=ls())
+
+# set the working directory to the folders where the data files are stored
+setwd("./data/effect_sizes")
+
 # the data loaded here was built with script 4_calculate_effect_sizes
 # and includes the coding database with the corresponding effect sizes
 # file: data_with_effect_sizes.csv
 
-file <- list.files("effect_sizes", pattern = 'csv',
-                   full.names = T)
-if(length(file) == 1){
-  dt <- fread(file)
-  print("YAY")
-}else{
-  print("CLEAN FILE FOLDER")
-}
-
-names(dt)
-
-# ICB: setwd("C:/Users/isabel/OneDrive - Menntaský/TUNDRAsalad systematic review/R/data/effect_sizes")
+# load the dataset
 dt <- fread("data_with_effect_sizes.csv")
-# LBP: setwd("C:/Users/laura/OneDrive - Menntaský/systematic review/R/data/effect_sizes")
-
 
 
 # 1. summary of studies included in quantitative synthesis --------------------
@@ -105,7 +96,6 @@ dt_f <- dt %>% filter(!is.na(yi_smd)) %>%   # remove missing values (286 studies
                    yi_smd < quantile(dt$yi_smd, .995, na.rm = TRUE)) %>% 
             # make sure article_ID is character
             mutate(article_ID = as.character(article_ID)) # dt_f has 3263 observations
-dt_f %>% distinct(change.long_f)
 
 length(dt$study_ID) - length(dt_f$study_ID) # excluding 450 studies so far
 
@@ -120,7 +110,7 @@ resp_var_f <- dt_f %>% group_by(var_class, MA.value, article_ID) %>%
 var_5_f <- dt_f %>% filter(MA.value %in% subset(resp_var_f, nr_articles >= 5)$MA.value) %>% 
   select(study_ID) %>% mutate(MA.5 = "included (5 articles)") # 2846 studies
 var_10_f <- dt_f %>% filter(MA.value %in% subset(resp_var_f, nr_articles >= 10)$MA.value) %>% 
-  select(study_ID) %>% mutate(MA.10 = "included (10 articles)") # 2235 studies
+  select(study_ID) %>% mutate(MA.10 = "included (10 articles)") # 2232 studies
 length(var_5_f$study_ID) - length(var_10_f$study_ID) 
     # 614 excluded studies from meta-regressions because the outcome was reported
     # by less than 10 articles
@@ -192,7 +182,8 @@ fig4 <- ggplot(outcome.vars[outcome.vars$nr_articles > 4,]) +
            coord_flip() 
 
 # save the figure to a separate file
-# ICB: setwd("C:/Users/isabel/OneDrive - Menntaský/TUNDRAsalad systematic review/R/data")
+# set the working directory to the main data folder
+setwd("./data")
 ggsave(fig4, file = "figures/Fig4.png", dpi = 600)
 
 
@@ -220,7 +211,7 @@ ggplot(outcome.class.vars, aes(x="", y = nr_studies, fill = var_class)) +
                     name = "Outcome variable") +
   theme_void()
 
-#percentages of each var_class
+# percentages of each var_class
 data.frame(var_class = outcome.class.vars$var_class,
            percentage = round(outcome.class.vars$nr_studies/sum(outcome.class.vars$nr_studies)*100,2))
 
@@ -262,7 +253,7 @@ dt_5_f %>% filter(size_selective_exclosures == "yes") %>%
               group_by(article_ID) %>% 
                     summarize(ns = n()) %>%
               ungroup() %>% summarize(nr_articles = n(), nr_studies = sum(ns)) 
-# 14 articles, 496 studies
+# 13 articles, 496 studies
 
 
 ## 2.1 create model guide ------------------------------------------------------
@@ -290,8 +281,9 @@ eco.intercepts <- data.table(var_class = NA, eco_response = NA,
 # and create an empty list to store orchard plots
 orchard.plot_list <- list()
 
-# set the working directory to data (where the folder "builds" is)
-# ICB: setwd("C:/Users/isabel/OneDrive - Menntaský/TUNDRAsalad systematic review/R/data")
+# make sure that there is a folder called "builds" in the working directory
+# with the folders "models" and "null_models" in it
+setwd("./data")
 
 # run the models
 tic()
@@ -499,7 +491,6 @@ fig5 <- ggplot()+
 fig5 
 
 # save the figure to a separate file
-# ICB: setwd("C:/Users/isabel/OneDrive - Menntaský/TUNDRAsalad systematic review/R/data")
 ggsave(fig5, file = "figures/Fig5.png", dpi = 600)
 
 
@@ -553,8 +544,9 @@ eco.intercepts <- data.table(var_class = NA, eco_response = NA,
 forest.plot_list <- list()
 orchard.plot_list <- list()
 
-# set the working directory to data (where the folder "builds_zero" is)
-# ICB: setwd("C:/Users/isabel/OneDrive - Menntaský/TUNDRAsalad systematic review/R/data/extra_analyses")
+# set the working directory to data (where the folder "extra_analyses">"builds_zero" is)
+# make sure the folder "builds" contains the folders "models" and "null_models"
+setwd("./data")
 
 # run the models
 tic()
@@ -583,7 +575,7 @@ for(i in 1:nrow(model_guide)){
         intercept.tmp$pi.lb <- predict(m0)$pi.lb[1]
         intercept.tmp$pi.ub <- predict(m0)$pi.ub[1]
         intercept.tmp$pval <- m0$pval[1] 
-    intercept.tmp$model_call <- paste0("builds_zero/models/null_models/", model_guide[i, ]$model_id,".rds")
+    intercept.tmp$model_call <- paste0("extra_analyses/builds_zero/models/null_models/", model_guide[i, ]$model_id,".rds")
     eco.intercepts <- rbind(eco.intercepts, intercept.tmp)
     
     # forest plot
@@ -607,7 +599,7 @@ for(i in 1:nrow(model_guide)){
   if (is.null(result)) {
     next
   }
-  write_rds(m0, paste0("builds_zero/models/null_models/", model_guide[i, ]$model_id, ".rds"))
+  write_rds(m0, paste0("extra_analyses/builds_zero/models/null_models/", model_guide[i, ]$model_id, ".rds"))
   cat(i,"/", nrow(model_guide), "\r")
 }
 toc()
@@ -615,9 +607,9 @@ toc()
 model_master <- eco.intercepts[!is.na(eco.intercepts$eco_response)] # remove first row (all NAs)
 
 sig <- model_master[pval < 0.05,]
-sig 
+sig # empty table -- no models are significant
 
-fwrite(model_master, "builds_zero/model_results/null_model_results_zero.csv")
+fwrite(model_master, "extra_analyses/builds_zero/model_results/null_model_results_zero.csv")
 
 # check the orchard plots
 do.call(grid.arrange, c(orchard.plot_list[1:5], ncol=3, nrow = 2))
