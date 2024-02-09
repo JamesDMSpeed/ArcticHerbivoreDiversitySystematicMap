@@ -22,11 +22,8 @@ library(stringr)
 
 
 # 1. load datasets -------------------------------------------------------------
-
-# set the working directory
-# LBP: setwd("C:/Users/laura/OneDrive - Menntaský/systematic review/R/data")
-# ICB: setwd("C:/Users/isabel/OneDrive - Menntaský/TUNDRAsalad systematic review/R/data")
-
+# set the working directory to the folders where the data files are stored
+setwd("./data")
 
 ## 1.1 overview dataset --------------------------------------------------------
 overview <- read_excel("MASTER_overview_file.xlsx", sheet = "screening") 
@@ -38,7 +35,7 @@ write_excel_csv(overview, file = "overview.csv", col_names = TRUE)
 # load and rearrange the raw data first
 # this takes a while from the excel file, so we will save it later as csv
 # so that it is faster to load
-raw.file   <- read_excel("../data/CODING_database.xlsx", sheet="CODING_all") %>% 
+raw.file   <- read_excel("CODING_database.xlsx", sheet = "CODING_all") %>% 
                 # remove columns that we do not need
                 select (-"topic", -"variable description", -"type", -"source")
 # we have each study in a separate column so we want to transpose the datasheet
@@ -46,9 +43,11 @@ raw.file_t = as_tibble(t(raw.file), rownames = "row_names")
   raw.file_t[,1] <- raw.file_t[, 8]       # study_ID as first column
   colnames(raw.file_t) <- raw.file_t[1,]  # our variable names are in the first row
   raw.file_t <- raw.file_t[-1,-8]         # remove first row and repeated column (study_ID)
+  # the file should contain 3713 obs of 99 variables
 
 write_excel_csv(raw.file_t, file = "raw.file_t.csv", col_names=TRUE)
 
+# alternatively, just load the csv file
 # raw.file_t <- read_csv("raw.file_t.csv")
 
 
@@ -83,7 +82,7 @@ write_excel_csv(raw.file_t, file = "raw.file_t.csv", col_names=TRUE)
     ## plant data
     # we want to get a list of unique values of plant species or groups identified
     # in the studies to assign to larger groups. Get a unique list of plant names:
-    plant_list <- read_excel("../data/Coding_database.xlsx", sheet="response_variables") %>% 
+    plant_list <- read_excel("CODING_database.xlsx", sheet = "outcomes") %>% 
                     filter(variable.group == "plant_abundance") %>% 
                       mutate(name_target = ifelse(name.target == "NA", "community", name.target)) %>% 
                         distinct(name_target) %>% arrange(name_target) %>% select(name_target)
@@ -95,7 +94,7 @@ write_excel_csv(raw.file_t, file = "raw.file_t.csv", col_names=TRUE)
 ### 1.2.2 clean and rearrange dataset ------------------------------------------
 # RUN FROM HERE
 # load values of measured outcome variables and grouping into broader categories
-outcome_variables <- read_excel("../data/Coding_database.xlsx", sheet="outcomes") %>% 
+outcome_variables <- read_excel("CODING_database.xlsx", sheet = "outcomes") %>% 
                         rename(study_ID = ID,
                                measured_response_variable_new = new.value,
                                name_target = name.target, 
@@ -103,14 +102,14 @@ outcome_variables <- read_excel("../data/Coding_database.xlsx", sheet="outcomes"
                         select(study_ID, measured_response_variable_new, target, name_target, response_variable_group, MA.value)
 
 # load herbivore list for conversion into larger herbivore groups
-new_values_herbivores <- read_excel("../data/Coding_database.xlsx", sheet="herbivores") %>% 
+new_values_herbivores <- read_excel("CODING_database.xlsx", sheet = "herbivores") %>% 
                 rename(herbivore_ID = original.value, # use original values for consistency w database
                        herbivore_group = herb.gr,     # herbivore groups based on body size
                        herbivore_fct_group = herb.fct.gr) # herbivore functional groups
 write_excel_csv(new_values_herbivores, file = "new_values_herbivores.csv", col_names=TRUE)
 
 # load plant list for conversion into larger plant groups
-new_values_plants <- read_excel("../data/Coding_database.xlsx", sheet="plants") %>% 
+new_values_plants <- read_excel("CODING_database.xlsx", sheet = "plants") %>% 
                 rename(name_target = original.value, # use original values for consistency w database
                        plant_group = plant.group) 
 write_excel_csv(new_values_plants, file = "new_values_plants.csv", col_names=TRUE)
