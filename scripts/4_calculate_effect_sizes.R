@@ -18,30 +18,14 @@ library(metagear) # to impute missing SD
 
 
 # load data --------------------------------------------------------------------
-
+# clean the environment first
 rm(list=ls())
 
-# in this script we will use the file coded_data.csv (from script 1), which
-# contains coded raw data extracted from studies
+# set the working directory to the folders where the data files are stored
+setwd("./data")
 
-# make sure we load the most recent data set
-# path name here is a path to an existing folder in your working directory
-file <- list.files("main_data", pattern = '.csv',
-                   full.names = T)
-
-if(length(file) == 1){
-  dt <- fread(file)
-  print("YAY")
-}else{
-  print("CLEAN FILE FOLDER")
-}
-
-names(dt)
-
-# set the working directory
-# ICB: setwd("C:/Users/isabel/OneDrive - Menntaský/TUNDRAsalad systematic review/R/data")
-# LBP: setwd("C:/Users/laura_jndxf5s/OneDrive - Menntaský/systematic review/R/data")
-# dt <- fread("coded_data.csv")
+# load the dataset
+dt <- fread("coded_data.csv")
 
 
 ## build scratch file ----------------------------------------
@@ -83,7 +67,7 @@ scratch <- dt  %>%
          L_upper = as.numeric(L_upper)) 
 summary(scratch) # scratch contains all observations
 
-scratch %>% distinct(article_ID)
+scratch %>% distinct(article_ID) # 201 articles
 
 # some checks: do we have studies with SD or SE with a sample size of 1?
 scratch %>% filter(variability_type == "SD" | variability_type == "SE") %>% 
@@ -452,12 +436,11 @@ responses.out %>% filter(yi_smd < quantile(responses.out$yi_smd, .005, na.rm = T
 
 range(responses.out$yi_smd, na.rm = TRUE) # ranges from -6893.7 to 11841.9
 
-# write out as a side-file which can be added to the main dataset when needed
+# write out as a side-file to be added to the main dataset
 effect.sizes <- responses.out %>% 
                   # remove NAs
                   filter(!is.na(yi_smd)) %>%   
                   select(study_ID, yi_smd, vi_smd, error_type)
-fwrite(effect.sizes, "side_files/effect_sizes.csv")
 
 dt.smd <- left_join(dt, effect.sizes, by = "study_ID") %>% 
   # make sure that variables contributing "negatively" have a negative ES
