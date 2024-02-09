@@ -18,12 +18,11 @@ library(irr)         # to calculate Cohen's kappa
 
 
 # load data --------------------------------------------------------------------
-
+# clean the environment first
 rm(list=ls())
 
-# set the working directory 
-# ICB: setwd("C:/Users/isabel/OneDrive - Menntaský/TUNDRAsalad systematic review/R/data")
-# LBP: setwd("C:/Users/laura/OneDrive - Menntaský/systematic review/R/data")
+# set the working directory to the folders where the data files are stored
+setwd("./data")
 
 # in this script we will use two files saved as csv after running script 1: 
 # 1) overview.csv: contains bibliographic information about the articles and 
@@ -78,7 +77,7 @@ overview %>%
 
 # how many articles retrieved through snowballing were included in the end?
 overview %>% filter(search_source == "snowballing") %>% 
-              filter(full_text_score_1 == "include") %>% count() #14 articles
+              filter(full_text_score_1 == "include") %>% count() # 14 articles
 
 # number of articles included or excluded after title screening
 score_title <- overview %>%
@@ -128,7 +127,7 @@ score_fulltext[score_fulltext$full_text_score == "exclude_population_habitat", ]
 score_fulltext[score_fulltext$full_text_score == "exclude_exposure_herbivore", ]$n      # 13
 score_fulltext[score_fulltext$full_text_score == "exclude_comparator", ]$n              # 146
 score_fulltext[score_fulltext$full_text_score == "exclude_study_design", ]$n            # 42
-sum(score_fulltext[score_fulltext$full_text_score %in% 
+  sum(score_fulltext[score_fulltext$full_text_score %in% 
                      c("exclude_outcome_effect","exclude_outcome"), ]$n)                # 20
 score_fulltext[score_fulltext$full_text_score == "exclude_redundant", ]$n               # 14
 
@@ -169,12 +168,10 @@ overview %>%
                       values_to = "name") %>% 
     drop_na() %>%  #drop NAs
     group_by(name) %>% count() %>% arrange(-n)
-  
-overview %>% 
-  # remove duplicates
-  filter(!title_score %in% c("duplicate")) %>% distinct(ID)
 
-  
+# how many titles were there without duplicates?  
+sum(score_title[score_title$title_score != "duplicate", ]$n) # 3947 titles
+
 title.scores <- overview %>% 
                   # remove duplicates and correction/reply
                   filter(search_source %in% c("Scopus", "WoS"),
@@ -467,5 +464,5 @@ p <- ggplot(study_validity_plot, aes(x = criterion, y = n, fill = level)) +
            axis.text = element_text(size = 12, color="black"))
 p
 
-ggsave(p, file= "../figures/risk_of_bias2.png", dpi = 600)
+ggsave(p, file = "./figures/risk_of_bias.png", dpi = 600)
 
