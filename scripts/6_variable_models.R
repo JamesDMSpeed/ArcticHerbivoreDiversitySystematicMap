@@ -1,10 +1,10 @@
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #       Systematic review on herbivory diversity in Arctic tundra
 #                      Meta-regression models
 #     Jonas Trepel (jonas.trepel@gmail.com / jonas.trepel@bio.au.dk)
 #     Erick J Lundgren (erick.lundgren@gmail.com / ejlundgren@bio.au.dk)
 #                        28/29-April-2023
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # what happens in this script: 
 # 0. get an overview of the responses and data distribution 
@@ -13,9 +13,10 @@
 # 1.2. loop models
 # 2. plot
 
+# clean the environment first
 rm(list=ls())
 
-# libraries----
+# libraries --------------------------------------------------------------------
 library(readxl)
 library(dplyr)
 library(ggplot2)
@@ -36,7 +37,8 @@ library(orchaRd)  # meta-analysis visualization package
                   # needed to calculate measures of heterogeneity for multilevel meta-analysis, marginal R2 etc
   # devtools::install_github("daniel1noble/orchaRd", force = TRUE)
 
-# load functions --------------------------------------------------------------
+
+# load functions ---------------------------------------------------------------
 # this function (written by Erick) allows to make predictions with the models 
 # https://stackoverflow.com/questions/63554740/predict-rma-onto-complex-new-data-in-metafor-polynomials-and-factor-levels
 
@@ -95,18 +97,11 @@ theme_systrev <- function(){ #create a new theme function for the style of graph
 # and includes the coding database with the corresponding effect sizes
 # file: data_with_effect_sizes.csv
 
-file <- list.files("effect_sizes", pattern = 'csv',
-                   full.names = T)
-if(length(file) == 1){
-  dt <- fread(file)
-  print("YAY")
-}else{
-  print("CLEAN FILE FOLDER")
-}
+# set the working directory to the folders where the data files are stored
+setwd("./data")
 
-# ICB: setwd("C:/Users/isabel/OneDrive - Menntaský/TUNDRAsalad systematic review/R/data/effect_sizes")
-# dt <- fread("data_with_effect_sizes.csv")
-# LBP: setwd("C:/Users/laura_jndxf5s/OneDrive - Menntaský/systematic review/R/data/effect_sizes")
+# load the dataset
+dt <- fread("effect_sizes/data_with_effect_sizes.csv")
 
 
 # clean up a bit (note that dataset dt_f includes more variables than in script 5)
@@ -218,8 +213,7 @@ model.results <- data.table(eco_response = NA, variable = NA,  model_id = NA, mo
                           r2_marginal = NA)
 
 # set the working directory to data (where the folder "builds" is)
-# ICB: setwd("C:/Users/isabel/OneDrive - Menntaský/TUNDRAsalad systematic review/R/data")
-# LBP: setwd("C:/Users/laura/OneDrive - Menntaský/systematic review/R/data")
+# setwd("./data")
 
 # we have to include different variables as moderators: 
 # - publication bias: small study effect and decline effect
@@ -314,9 +308,7 @@ fwrite(model.results, "builds/model_results/variable_model_results.csv")
 
 # (if skipping step 1, then need to run this first:
 # dt_10_f <- dt_f %>% filter(MA.value %in% subset(resp_var_f, nr_articles >= 10)$MA.value) # 2232 studies
-# set the working directory to data (where the folder "builds" is)
-# ICB: setwd("C:/Users/isabel/OneDrive - Menntaský/TUNDRAsalad systematic review/R/data")
-# LBP: setwd("C:/Users/laura/OneDrive - Menntaský/systematic review/R/data")
+# set the working directory to data (where the folder "builds" is) and
 # load model results from step 1:
 # model.results <- fread("builds/model_results/variable_model_results.csv")
 # sig <- model.results[pval < 0.05,] # check which variables are significant (28)
@@ -444,7 +436,7 @@ model.t <- flextable(model.table) %>%
             autofit() 
 model.t
 
-save_as_docx(model.t, path = "../tables/model_table.docx")
+save_as_docx(model.t, path = "./tables/model_table.docx")
 
 
 # 3. prediction / estimate plots -----------------------------------------------
@@ -1470,7 +1462,6 @@ fig6 <- ggarrange(change_plantCN + ggtitle("a. Plant C:N"),
 fig6
 
 # save the figure to a separate file
-# ICB: setwd("C:/Users/isabel/OneDrive - Menntaský/TUNDRAsalad systematic review/R/data")
 ggsave(fig6, file = "figures/Fig6.png", dpi = 600)
 
 
@@ -1490,7 +1481,6 @@ fig7 <- ggarrange(bias_plantC + ggtitle("a. Plant C content"),
 fig7
 
 # save the figure to a separate file
-# ICB: setwd("C:/Users/isabel/OneDrive - Menntaský/TUNDRAsalad systematic review/R/data")
 ggsave(fig7, file = "figures/Fig7.png", dpi = 600)
 
 
@@ -1503,7 +1493,6 @@ fig8 <- ggarrange(hab_diversity + ggtitle("a. Plant diversity"),
 fig8
 
 # save the figure to a separate file
-# ICB: setwd("C:/Users/isabel/OneDrive - Menntaský/TUNDRAsalad systematic review/R/data")
 ggsave(fig8, file = "figures/Fig8.png", dpi = 600)
 
 
@@ -1517,7 +1506,6 @@ fig6b
 
 
 ## 5. sensitivity analysis (leave-one-out) -------------------------------------
-
 cooks.distance_results <- cooks.distance(m0, progbar=TRUE,  reestimate=TRUE, 
                                          parallel="snow", ncpus=4, cluster = study_ID)
 

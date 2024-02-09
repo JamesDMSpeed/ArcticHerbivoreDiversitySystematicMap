@@ -64,14 +64,14 @@ hp(n = 15, house = "Ravenclaw")[15] # colour for positive effects
 rm(list=ls())
 
 # set the working directory to the folders where the data files are stored
-setwd("./data/effect_sizes")
+setwd("./data")
 
 # the data loaded here was built with script 4_calculate_effect_sizes
 # and includes the coding database with the corresponding effect sizes
 # file: data_with_effect_sizes.csv
 
 # load the dataset
-dt <- fread("data_with_effect_sizes.csv")
+dt <- fread("effect_sizes/data_with_effect_sizes.csv")
 
 
 # 1. summary of studies included in quantitative synthesis --------------------
