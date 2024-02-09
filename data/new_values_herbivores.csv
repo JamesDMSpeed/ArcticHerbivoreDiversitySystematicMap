@@ -1,0 +1,82 @@
+﻿"herbivore_ID","new.value","type","herbivore_group","herbivore_fct_group","comments"
+"Aculus_tetanothrix","Aculus_tetranothix","species","invertebrate_herbivores","inv",NA
+"Alces_alces","Alces_alces","species","large_herbivores","F3",NA
+"Anser_albifrons","Anser_albifrons","species","medium_herbivores","F1",NA
+"Anser_albifrons_frontalis","Anser_albifrons_frontalis","species","medium_herbivores","F1",NA
+"Anser_brachyrhynchus","Anser_brachyrhynchus","species","medium_herbivores","F1",NA
+"Anser_caerulescens","Chen_caerulescens","species","medium_herbivores","F1","NL: if we aim for a european journal we can keep Anser otherwise it should be Chen"
+"Anser_caerulescens_atlanticus","Chen_caerulescens_atlanticus","species","medium_herbivores","F1","NL: if we aim for a european journal we can keep Anser otherwise it should be Chen"
+"Anser_caerulescens_caerulescens","Chen_caerulescens_caerulescens","species","medium_herbivores","F1","NL: if we aim for a european journal we can keep Anser otherwise it should be Chen"
+"Branta_bernicla","Branta_bernicla","species","medium_herbivores","F1",NA
+"Branta_bernicla_bernicla","Branta_bernicla_bernicla","species","medium_herbivores","F1",NA
+"Branta_bernicla_nigricans","Branta_bernicla_nigricans","species","medium_herbivores","F1",NA
+"Branta_canadensis","Branta_canadensis","species","medium_herbivores","F1",NA
+"Branta_canadensis_interior","Branta_canadensis_interior","species","medium_herbivores","F1",NA
+"Branta_canadensis_minima","Branta_canadensis_minima","species","medium_herbivores","F1",NA
+"Branta_leucopsis","Branta_leucopsis","species","medium_herbivores","F1",NA
+"Chen_caerulescens","Chen_caerulescens","species","medium_herbivores","F1","NL: if we aim for a european journal we can keep Anser otherwise it should be Chen"
+"Chen_caerulescens_atlantica","Chen_caerulescens_atlanticus","species","medium_herbivores","F1","NL: if we aim for a european journal we can keep Anser otherwise it should be Chen"
+"Chen_caerulescens_caerulescens","Chen_caerulescens_caerulescens","species","medium_herbivores","F1","NL: if we aim for a european journal we can keep Anser otherwise it should be Chen"
+"Clethrionomys_rufocanus","Myodes_rufocanus","species","small_herbivores","F2",NA
+"Clethrionomys_rutilus","Myodes_rutilus","species","small_herbivores","F3","*Myodes rutilus is grouped in F3, separate from other small mammals (incl. for example Myodes rufocanus, which is F2)"
+"Clethrionomys_spp","Myodes_spp","species","small_herbivores","F2",NA
+"defoliating_invertebrates","defoliating_invertebrates","group","invertebrate_herbivores","inv",NA
+"Dicrostonyx_groenlandicus","Dicrostonyx_groenlandicus","species","small_herbivores","F2",NA
+"Dicrostonyx_rubicatus","Dicrostonyx_rubicatus","species","small_herbivores","F2",NA
+"Dicrostonyx_spp","Dicrostonyx_spp","species","small_herbivores","F2",NA
+"Dicrostonyx_torquatus","Dicrostonyx_torquatus","species","small_herbivores","F2",NA
+"Dicrostonyx_torquatus_groenlandicus","Dicrostonyx_torquatus_groenlandicus","species","small_herbivores","F2",NA
+"Epirrita autumnata","Epirrita_autumnata","species","invertebrate_herbivores","inv",NA
+"Epirrita_autumnata","Epirrita_autumnata","species","invertebrate_herbivores","inv",NA
+"eriophyid_mite","eriophyid_mites","group","invertebrate_herbivores","inv",NA
+"eriophyid_mites","eriophyid_mites","group","invertebrate_herbivores","inv",NA
+"Eupontania_aquilonis","Euura_aquilonis","species","invertebrate_herbivores","inv",NA
+"Eupontania_arctica","Euura_arctica","species","invertebrate_herbivores","inv",NA
+"galling_invertebrates","galling_invertebrates","group","invertebrate_herbivores","inv",NA
+"geese","geese","group","medium_herbivores","F1",NA
+"goose","geese","group","medium_herbivores","F1",NA
+"grey_sided_vole","Myodes_rufocanus","species","small_herbivores","F2",NA
+"insect_herbivores","invertebrate_herbivores","group","invertebrate_herbivores","inv",NA
+"invertebrate_herbivores","invertebrate_herbivores","group","invertebrate_herbivores","inv",NA
+"invertebrates","invertebrate_herbivores","group","invertebrate_herbivores","inv",NA
+"Lagopus_lagopus","Lagopus_lagopus","species","medium_herbivores","F3",NA
+"Lagopus_muta","Lagopus_muta","species","medium_herbivores","F3",NA
+"Lagopus_mutus","Lagopus_muta","species","medium_herbivores","F3",NA
+"Lagopus_mutus_hyperboreus","Lagopus_muta_hyperborea","species","medium_herbivores","F3",NA
+"Lagopus_spp","Lagopus_spp","species","medium_herbivores","F3",NA
+"large_herbivores","large_herbivores","group","large_herbivores","F3",NA
+"lemming","lemmings","group","small_herbivores","F2",NA
+"lemmings","lemmings","group","small_herbivores","F2",NA
+"Lemmus_lemmus","Lemmus_lemmus","species","small_herbivores","F2",NA
+"Lemmus_sibiricus","Lemmus_sibiricus","species","small_herbivores","F2",NA
+"Lemmus_spp","Lemmus_spp","species","small_herbivores","F2",NA
+"Lemmus_trimucronatus","Lemmus_trimucronatus","species","small_herbivores","F2",NA
+"Lepus_americanus","Lepus_americanus","species","medium_herbivores","F3",NA
+"Lepus_arcticus","Lepus_arcticus","species","medium_herbivores","F3",NA
+"Lepus_timidus","Lepus_timidus","species","medium_herbivores","F3",NA
+"microtine_rodents","microtine_rodents","group","small_herbivores","F2",NA
+"Microtus_agrestis","Microtus_agrestis","species","small_herbivores","F2",NA
+"Microtus_gregalis","Microtus_gregalis","species","small_herbivores","F2",NA
+"Microtus_middendorffi","Microtus_middendorffi","species","small_herbivores","F2",NA
+"Microtus_miurus","Microtus_miurus","species","small_herbivores","F2",NA
+"Microtus_oeconomus","Microtus_oeconomus","species","small_herbivores","F2",NA
+"Microtus_spp","Microtus_spp","species","small_herbivores","F2",NA
+"mining_invertebrates","mining_invertebrates","group","invertebrate_herbivores","inv",NA
+"Myodes_rufocanus","Myodes_rufocanus","species","small_herbivores","F2",NA
+"Myodes_rutilus","Myodes_rutilus","species","small_herbivores","F3","*Myodes rutilus is grouped in F3, separate from other small mammals (incl. for example Myodes rufocanus, which is F2)"
+"Myodes_spp","Myodes_spp","species","small_herbivores","F2",NA
+"Operophtera_brumata","Operophtera_brumata","species","invertebrate_herbivores","inv",NA
+"Ovibos_moschatus","Ovibos_moschatus","species","large_herbivores","F3",NA
+"Ovis aries","Ovis_aries","species","large_herbivores","F3",NA
+"Ovis_aries","Ovis_aries","species","large_herbivores","F3",NA
+"Pontania_nivalis","Pontania_nivalis","species","invertebrate_herbivores","inv",NA
+"Rangifer_tarandus","Rangifer_tarandus","species","large_herbivores","F3",NA
+"Rangifer_tarandus_groenlandicus","Rangifer_tarandus_groenlandicus","species","large_herbivores","F3",NA
+"Rangifer_tarandus_platyrhynchus","Rangifer_tarandus_platyrhynchus","species","large_herbivores","F3",NA
+"Rangifer_tarandus_tarandus","Rangifer_tarandus_tarandus","species","large_herbivores","F3",NA
+"rodents","rodents","group","small_herbivores","F2",NA
+"small_mammals","small_mammals","group","small_herbivores","F2",NA
+"Spermophilus_parryii","Urocitellus_parryii","species","medium_herbivores","F3",NA
+"Urocitellus_parryii","Urocitellus_parryii","species","medium_herbivores","F3",NA
+"voles","voles","group","small_herbivores","F2",NA
+"zero","zero","group","zero","zero",NA
