@@ -42,10 +42,11 @@ theme_systrev <- function(){ #create a new theme function for the style of graph
 
 
 # 1. load datasets -------------------------------------------------------------
+# clean the environment first
+rm(list=ls())
 
-# set the working directory
-# LBP: setwd("C:/Users/laura/OneDrive - Menntaský/systematic review/R/data")
-# ICB: setwd("C:/Users/isabel/OneDrive - Menntaský/TUNDRAsalad systematic review/R/data")
+# set the working directory to the folders where the data files are stored
+setwd("./data")
 
 # in this script we will use the file coded_data.csv (from script 1), which
 # contains coded raw data extracted from studies, as well as the lists of
@@ -141,7 +142,7 @@ sizeselective.t <- flextable(sizeselective.table) %>%
             autofit() 
 sizeselective.t
 
-save_as_docx(sizeselective.t, path = "../tables/sizeselective_table.docx")
+save_as_docx(sizeselective.t, path = "./tables/sizeselective_table.docx")
 
 
 # how many articles(studies) studied invertebrate herbivory?
@@ -220,17 +221,17 @@ outcome.table <- coded_data %>%
                             "reported outcome variable" = measured_response_variable_new) 
 
 outcome.table %>% ungroup() %>% summarize(n= length(`reported outcome variable`)) 
-  # 321 unique values for outcome variables
+  # 319 unique values for outcome variables
 outcome.table %>% ungroup() %>% distinct(`outcome variable`) %>% 
   summarize(n= length(`outcome variable`)) 
-  # 101 unique groups (MA.value)
+  # 100 unique groups (MA.value)
 
 outcome.t <- flextable(outcome.table) %>% 
             merge_v(j = ~ `group` + `outcome variable`) %>% 
             autofit() 
 outcome.t
 
-save_as_docx(outcome.t, path = "../tables/outcome_table.docx")
+save_as_docx(outcome.t, path = "./tables/outcome_table.docx")
 
 
 # a plot of outcome variables is provided in script 5
@@ -258,7 +259,7 @@ herb.t <- flextable(herbivore.table) %>%
             autofit() 
 herb.t
 
-save_as_docx(herb.t, path = "../tables/herbivore_table.docx")
+save_as_docx(herb.t, path = "./tables/herbivore_table.docx")
 
 # herbivore diversity contrasts (body size)
 herbivore.gr <- herbivore_groups %>% group_by(change.num, change.long, change, contrast, article_ID) %>% 
@@ -282,7 +283,7 @@ herb.contrasts.t <- flextable(herbivore.gr) %>%
             autofit() 
 herb.contrasts.t 
 
-save_as_docx(herb.contrasts.t, path = "../tables/herbivore_contrasts.docx")
+save_as_docx(herb.contrasts.t, path = "./tables/herbivore_contrasts.docx")
 
 
 ### 3.2.2 functional groups ----------------------------------------------------
@@ -305,7 +306,7 @@ herb.f.t <- flextable(herbivore.f.table) %>%
             autofit() 
 herb.f.t
 
-save_as_docx(herb.f.t, path = "../tables/herbivore_f_table.docx")
+save_as_docx(herb.f.t, path = "./tables/herbivore_f_table.docx")
 
 # herbivore diversity contrasts
 herbivore.f.gr <- herbivore_groups %>% group_by(change.num.f, change.long_f, change_f, contrast_f, article_ID) %>% 
@@ -331,7 +332,7 @@ herb.contrasts.f.t <- flextable(herbivore.f.gr) %>%
             autofit() 
 herb.contrasts.f.t 
 
-save_as_docx(herb.contrasts.f.t, path = "../tables/herbivore_contrasts_f.docx")
+save_as_docx(herb.contrasts.f.t, path = "./tables/herbivore_contrasts_f.docx")
 
 
 
@@ -355,7 +356,7 @@ plant.t <- flextable(plant.table) %>%
             autofit() 
 plant.t
 
-save_as_docx(plant.t, path = "../tables/plant_table.docx")
+save_as_docx(plant.t, path = "./tables/plant_table.docx")
 
 
 
