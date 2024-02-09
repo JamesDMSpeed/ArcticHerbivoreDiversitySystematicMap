@@ -1,0 +1,18 @@
+eco_response,formula,model_call,LRT,pval,BIC,AIC,AICc,deltaAICc,row_number
+plant_CN_ratio,yi_smd ~ change_f + exclusion + spatial_resolution -1,builds/models/variable_models_M/plant_CN_ratio.rds,13.287468249915,0.00995333227994367,132.508837611996,121.621401181571,125.769549329719,-1.91351365015397,1
+plant_C_content,yi_smd ~ overall_criterion -1,builds/models/variable_models_M/plant_C_content.rds,8.60603378410673,0.0135276858203464,295.876035822161,283.781832783178,284.561053562399,-4.13061047324038,2
+plant_abundance_bryophytes,yi_smd ~ exclusion -1,builds/models/variable_models_M/plant_abundance_bryophytes.rds,3.98133895930141,0.0460069778229907,406.300282414194,395.217543916331,395.571526217216,-1.83788297420591,3
+plant_abundance_dwarf_shrubs,"yi_smd ~ herb_fgr_change + exclusion + 
+                                      spatial_resolution -1",builds/models/variable_models_M/plant_abundance_dwarf_shrubs.rds,19.2648229182626,0.00171556602185081,650.166704076451,623.582624243344,624.317318120895,-8.64953202578636,4
+plant_abundance_graminoids,yi_smd ~ change_f -1,builds/models/variable_models_M/plant_abundance_graminoids.rds,15.7956196998301,0.00330603832285648,915.779883196448,891.444638332928,891.929486817776,-7.41289887455605,5
+plant_abundance_lichens,yi_smd ~ change_f -1,builds/models/variable_models_M/plant_abundance_lichens.rds,10.6457709746877,0.0138039629859856,490.771377210647,472.628094085569,473.207404430397,-4.22862279202224,6
+plant_abundance_tall_shrubs,yi_smd ~ error_type -1,builds/models/variable_models_M/plant_abundance_tall_shrubs.rds,8.11853579577482,0.0436244089579476,140.069210257371,128.968324647111,131.068324647111,-0.576675330658532,7
+plant_diversity,yi_smd ~ distance_to_treeline + habitat_type -1,builds/models/variable_models_M/plant_diversity.rds,11.5075132280238,0.00927550118483049,137.09067976328,124.42543657824,125.980992133795,-4.3730103040472,8
+plant_fitness,yi_smd ~ error_type -1,builds/models/variable_models_M/plant_fitness.rds,6.12479430160437,0.0133298796924481,271.747644372404,263.050095292822,263.716761959488,-3.85157025788851,9
+plant_height,"yi_smd ~ change_f + error_type + exclusion + 
+                                      habitat_type + overall_criterion + study_length -1",builds/models/variable_models_M/plant_height.rds,42.7364207012078,2.50215096449685e-05,299.682627804856,260.605075015034,266.31936072932,-13.2721349869221,10
+plant_productivity,yi_smd ~ permafrost_D + recent_warming + temperature,builds/models/variable_models_M/plant_productivity.rds,11.4486089603346,0.00953169853715856,170.610606746749,158.145382083314,159.760766698699,-4.26958798131358,11
+plant_species_richness,yi_smd ~ permafrost_D,builds/models/variable_models_M/plant_species_richness.rds,3.90753395990646,0.0480700848536444,132.819479007036,123.603218634219,124.182928779147,-1.67068095783608,12
+plant_structure,yi_smd ~ year.c,builds/models/variable_models_M/plant_structure.rds,5.10672288524609,0.0238332976087302,370.999895002391,360.619415601852,361.044947516746,-2.93382254929986,13
+soil_C_labile,yi_smd ~ error_type -1,builds/models/variable_models_M/soil_C_labile.rds,7.25164087206034,0.0266272424232343,90.8132775045985,85.1358064249528,88.6652181896587,-0.985387002091301,14
+soil_moisture,yi_smd ~ error_type + year.c -1,builds/models/variable_models_M/soil_moisture.rds,18.3295010422158,0.000376112651985095,111.086541734972,102.292126318173,105.652126318173,-9.82664389935861,15
