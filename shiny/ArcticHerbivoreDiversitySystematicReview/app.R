@@ -37,6 +37,15 @@ MyTab<-MyTab[!is.na(MyTab$coordinates_E),]
 #Remove points with NA in yi
 MyTab<-MyTab[!is.na(MyTab$yi_smd),]
 
+#Truncate for plotting
+MyTab$yi_smd[MyTab$yi_smd>5]<-5
+MyTab$yi_smd[MyTab$yi_smd< -5]<-(-5)
+
+#Rounding and truncating text for popups
+MyTab$EffectSize<-round(MyTab$yi_smd,1)
+MyTab$FirstAuthor<-sapply(strsplit(MyTab$author_list," "), `[`, 1)
+
+
 # # Add shortened versions of author lists, but first, change weird column name
 # if(!"author_list" %in% names(MyTab)) colnames(MyTab)[2] <- "author_list"
 # MyTab$author_list <- as.character(MyTab$author_list)
@@ -337,13 +346,14 @@ ui <- dashboardPage(
                              label = "Filters", 
                              value = TRUE,
                              labelWidth = "80px")
+                    )#,
+                    #column(width=5,
+                    #       pickerInput(inputId = "colour", 
+                    #                   label = "Colour by:", 
+                    #                   choices =varA,
+                    #                   selected = "country",
+                    #                   options = list(size=10)))
                     ),
-                    column(width=5,
-                           pickerInput(inputId = "colour", 
-                                       label = "Colour by:", 
-                                       choices =varA,
-                                       selected = "country",
-                                       options = list(size=10)))),
                   
                   
                   
@@ -373,37 +383,7 @@ ui <- dashboardPage(
                              `actions-box` = TRUE, `selected-text-format`= "static", title = "Country",size=6)),
                          
                          
-                         # # .. Species ---------------------------------------------------------------
-                         # 
-                         # pickerInput(
-                         #   inputId = "species",
-                         #   choices = sort(species4),
-                         #   selected = sort(species4),
-                         #   multiple = TRUE,
-                         #   width = "100%",
-                         #   options = list(
-                         #     `actions-box` = TRUE, `selected-text-format`= "static", title = "Species",size=6)),
-                         # 
-                         # 
-                  #        
-                  #                                # .. Herbivore -------------------------------------------------------------
-                  #        
-                  #        
-                  #        pickerInput(inputId = "herbivore", 
-                  #                    choices = unique(MyTab$herbivore_type),
-                  #                    selected = unique(MyTab$herbivore_type),
-                  #                    multiple = TRUE,
-                  #                    width = "100%",
-                  #                    options = list(
-                  #                      `actions-box` = TRUE, 
-                  #                      `selected-text-format`= "static",
-                  #                      title = "Herbivore")
-                  #        )
-                  #        
-                  # ),
-                  # column(width = 6,
-                  #        
-                  #        
+                           
                          
                          # .. study design ----------------------------------------------------------
                          
@@ -420,7 +400,7 @@ ui <- dashboardPage(
                          
                          
                          
-                         # .. study method ----------------------------------------------------------
+                         # .. diversity contrast ----------------------------------------------------------
                          
                          pickerInput(
                            inputId = 'diversity_contrast',
@@ -429,11 +409,11 @@ ui <- dashboardPage(
                            multiple = TRUE,
                            width = "100%",
                            options = list(
-                             `actions-box` = TRUE, 
+                             `actions-box` = TRUE,
                              `selected-text-format`= "static",
                              title = "Diversty contrast")
                          ),
-                         
+
                   
                   
                   # .. measured response vairable ----------------------------------------------------------
@@ -448,24 +428,12 @@ ui <- dashboardPage(
                       `actions-box` = TRUE, 
                       `selected-text-format`= "static",
                       title = "Response Variable")
-                  )#,
-                         # # .. ex. design ------------------------------------------------------------
-                         # 
-                         # pickerInput(
-                         #   inputId = 'expdesign',
-                         #   choices = unique(MyTab$experimental_design),
-                         #   selected = unique(MyTab$experimental_design),
-                         #   multiple = TRUE,
-                         #   width = "100%",
-                         #   options = list(
-                         #     `actions-box` = TRUE, 
-                         #     `selected-text-format`= "static",
-                         #     title = "Design")
-                         # ),
+                  ),
+                       
                          
                          # Remaining datapoints ----------------------------------------------------
                          
-                         #verbatimTextOutput('remaining')
+                         verbatimTextOutput('remaining')
                          
                          
                   ) # column
@@ -647,7 +615,7 @@ server <- function(input, output, session){
   
   
   # FILTERED DATASET -------------------------------------
-
+  
   datR <- reactive({
      # for(i in 1:nrow(MyTab)){
      #   #MyTab$incl[i] <- any(input$species %in% gsub(" ", "", unlist(strsplit(MyTab$herbivore_identity[i], ","))))
@@ -661,8 +629,8 @@ server <- function(input, output, session){
         MyTab$country %in% input$country &
         MyTab$study_design %in% input$study_design &
         MyTab$diversity_contrast %in% input$diversity_contrast &
-        MyTab$measured_response_variable_new %in% input$measured_response_variable_new &
-        MyTab$change.long_f %in% input$change.long_f #&
+        MyTab$measured_response_variable_new %in% input$measured_response_variable_new #&
+       # MyTab$change.long_f %in% input$change.long_f #&
       #  MyTab$experimental_design %in% input$expdesign
       ,]
     
@@ -675,60 +643,59 @@ server <- function(input, output, session){
   
   
   # THE MAP ####
+#  MyTab$colorings<-ifelse(MyTab$yi_smd>0, log(MyTab$yi_smd),
+#                    ifelse(MyTab$yi_smd<0, -(log(abs(MyTab$yi_smd))), 0)) 
+  
+  
+  
   output$theMap <- renderLeaflet({
     
     ifelse(input$filteron == TRUE, dat <- datR(), dat <- MyTab)
-    # Convert to spatial...
-   # dat2 <- sp::SpatialPointsDataFrame(coords = dat[,c("coordinates_E","coordinates_N")], 
-    #                                   data = dat,
-    #                                   proj4string = CRS("+proj=longlat +datum=WGS84"))# +ellps=WGS84 +towgs84=0,0,0"))
-    
+ 
     dat2<-st_as_sf(dat,coords=c("coordinates_E","coordinates_N"),crs=CRS("+proj=longlat +datum=WGS84"))
-    
-    #dat2 <- sf::st_as_sf(dat2)
     dat2 <- st_jitter(dat2, factor = 0.00001)
     
     #colpoints = brewer.pal(12,"Set3")
-    pal = mapviewPalette("mapviewVectorColors")
-    
-    # mapviewOptions(vector.palette = brewer.pal(12,"Set3"),
-    #                 na.color = grey(0.8),
-    #                layers.control.pos = "topright") 
-    #scale_range=c(-1,1)
-    limit <- max(abs(MyTab$yi_smd)) * c(-1, 1)
-    #limit<-c(0.5,-0.5)
-    #pal<-scale_fill_distiller(type = "div", limit = limit)
-    #palD <- colorNumeric("RdBu", domain = limit)
-    #color_palette <- rev(brewer.pal(11, "RdBu"))
-    minval<-min(MyTab$yi_smd)
-    maxval<-max(MyTab$yi_smd)
-    brks <- c(minval,-1,-0.5,-0.1,0,0.1,0.5,1,maxval)
-    #bias <- log(maxval/(maxval - minval))/log(0.5)
-    #color_palette_on_zero <- (colorRampPalette(brewer.pal(11, "RdBu")) )
-    #cols<-scale_fill_gradient2(MyTab$yi_smd)
-    colBin<-colorQuantile(palette="RdBu",domain=MyTab$yi_smd,n=5)
-    color_palette <- colorNumeric(
+    # pal = mapviewPalette("mapviewVectorColors")
+    # 
+    # limit <- max(abs(MyTab$yi_smd)) * c(-1, 1)
+     minval<-min(MyTab$yi_smd)
+     maxval<-max(MyTab$yi_smd)
+     brks <- c(minval,-1,-0.5,-0.1,0,0.1,0.5,1,maxval)
+     bias <- log(maxval/(maxval - minval))/log(0.5)
+     
+    # 
+    # limit2<-max(abs(MyTab$colorings))
+    # mycols<-colorNumeric("RdBu",domain=limit2)
+    # 
+    # color_palette_on_zero <- (colorRampPalette(brewer.pal(11, "RdBu")) )
+    # cols<-scale_fill_gradient2(MyTab$yi_smd,midpoint = 0)
+    # colBin<-colorQuantile(palette="RdBu",domain=MyTab$yi_smd,n=20)
+    color_palette <- colorBin(
       palette = colorRampPalette(c("blue", "white", "red"))(20),
-      domain = MyTab$yi_smd
+      domain = c(-2,2)
     )
+
+    pal <-  mapviewPalette("mapviewSpectralColors")
     
-    m <- mapview::mapview(dat2,#["yi_smd"],
-                          layer.name = "Evidence Point",
-                          map.types = c("OpenStreetMap.Mapnik","Esri.WorldImagery"),
-                          cex = 5,#dat2$yi_smd,
+    m <- mapview::mapview(dat2["yi_smd"],
+                          layer.name = "Effect size",
+                          map.types = c("Esri.WorldImagery"),
+                          cex = 5,#+abs(dat2$yi_smd),
                           alpha.regions = 0.8,
-                          zcol =input$colour,
                           #na.color=grey(0.8,alpha=0.8),
+                          #zcol=input$color,
                           popup = leafpop::popupTable(dat2, 
                                                       row.numbers = F, feature.id = F,
-                                                      zcol = c("article_ID",
-                                                               #"author_list",
+                                                      zcol = c("EffectSize",
+                                                               "article_ID",
+                                                               "FirstAuthor",
                                                                "year",
                                                                "journal",
                                                                "study_design"
                                                                )),
-                          col.regions=pal,
-                          color=pal,
+                          col.regions=pal(100),
+                          #color=pal(100),
                           legend=T)
     
     m@map
