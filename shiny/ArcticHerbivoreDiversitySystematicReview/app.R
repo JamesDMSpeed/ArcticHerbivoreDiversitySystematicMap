@@ -201,7 +201,7 @@ ui <- dashboardPage(
     
     # Description text and Active Filters ####
     h5("This is an interactive user interface of the systematic review of herbivore diversity impacts in the Arctic tundra.",tags$br(),
-       "Above, the spatial distribution of evidence points is shown. These can be filtered  by a range of variables.",tags$br(),
+       "Above, the spatial distribution of studies is shown. These can be filtered  by a range of variables.",tags$br(),
        "The full data set can be downloaded below.",tags$br(),
        "The systematic review is published as Barbero-Palacios et al. 2024 Environmental Evidence", tags$a(href="https://www.youtube.com/watch?v=dQw4w9WgXcQ","here"), " [PLACEHOLDER]" ,tags$br(),
        "The systematic review protocol is published as Barrio et al. 2022 Environmental Evidence and can be downloaded", tags$a(href="https://environmentalevidencejournal.biomedcentral.com/articles/10.1186/s13750-022-00257-z", "here"),tags$br(),
