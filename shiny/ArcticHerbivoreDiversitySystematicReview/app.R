@@ -31,8 +31,11 @@ MyTab <- fread("data_with_effect_sizes.csv")
 
 MyTab$coordinates_E<-as.numeric(MyTab$coordinates_E)
 MyTab$coordinates_N<-as.numeric(MyTab$coordinates_N)
-MyTab<-MyTab[!is.na(MyTab$coordinates_E),]
 
+#Remove points with NA in coordinates
+MyTab<-MyTab[!is.na(MyTab$coordinates_E),]
+#Remove points with NA in yi
+MyTab<-MyTab[!is.na(MyTab$yi_smd),]
 
 # # Add shortened versions of author lists, but first, change weird column name
 # if(!"author_list" %in% names(MyTab)) colnames(MyTab)[2] <- "author_list"
@@ -255,7 +258,8 @@ MyTab<-MyTab[!is.na(MyTab$coordinates_E),]
 
 
 
-varA <- c("change.long_f",
+varA <- c("year",
+          "change.long_f",
           "measured_response_variable_new",
           "country",
           "study_design",
@@ -350,7 +354,7 @@ ui <- dashboardPage(
                               label = h5("Publication year"), 
                               min = 1940, #min(MyTab$year), 
                               max = 2021, #min(MyTab$year), 
-                              value = c(1945, 2021),
+                              value = c(1940, 2021),
                               step=1, sep="", ticks=F, width = "100%",
                               animate=F
                   ),
@@ -430,6 +434,21 @@ ui <- dashboardPage(
                              title = "Diversty contrast")
                          ),
                          
+                  
+                  
+                  # .. measured response vairable ----------------------------------------------------------
+                  
+                  pickerInput(
+                    inputId = 'measured_response_variable_new',
+                    choices = unique(MyTab$measured_response_variable_new),
+                    selected = unique(MyTab$measured_response_variable_new),
+                    multiple = TRUE,
+                    width = "100%",
+                    options = list(
+                      `actions-box` = TRUE, 
+                      `selected-text-format`= "static",
+                      title = "Response Variable")
+                  )#,
                          # # .. ex. design ------------------------------------------------------------
                          # 
                          # pickerInput(
@@ -446,7 +465,7 @@ ui <- dashboardPage(
                          
                          # Remaining datapoints ----------------------------------------------------
                          
-                        # verbatimTextOutput('remaining')
+                         #verbatimTextOutput('remaining')
                          
                          
                   ) # column
@@ -614,43 +633,38 @@ server <- function(input, output, session){
   
   # LOOKUP TABLE -------------------------------------------
   
-  oneFeatureTab <- reactive({
-    Value <- t(MyTab[MyTab$article_ID==input$feature,])
-    Variable <- rownames(Value)
-    temp <- as.data.frame(cbind(Variable, Value))
-    colnames(temp) <- c("Variable", "Value")
-    temp
-  })
-  
-  output$oneFeature <- renderTable(
-    oneFeatureTab(), rownames = FALSE
-  )
+  # oneFeatureTab <- reactive({
+  #   Value <- t(MyTab[MyTab$article_ID==input$feature,])
+  #   Variable <- rownames(Value)
+  #   temp <- as.data.frame(cbind(Variable, Value))
+  #   colnames(temp) <- c("Variable", "Value")
+  #   temp
+  # })
+  # 
+  # output$oneFeature <- renderTable(
+  #   oneFeatureTab(), rownames = FALSE
+  # )
   
   
   # FILTERED DATASET -------------------------------------
-  
-  
-  
-  
-  
-  
+
   datR <- reactive({
-     for(i in 1:nrow(MyTab)){
-       #MyTab$incl[i] <- any(input$species %in% gsub(" ", "", unlist(strsplit(MyTab$herbivore_identity[i], ","))))
-       MyTab$incl[i] <- TRUE
-       }
+     # for(i in 1:nrow(MyTab)){
+     #   #MyTab$incl[i] <- any(input$species %in% gsub(" ", "", unlist(strsplit(MyTab$herbivore_identity[i], ","))))
+     #   MyTab$incl[i] <- any(input$country %in% gsub(" ", "", unlist(strsplit(MyTab$herbivore_identity[i], ","))))
+     #   }
      
     
     MyTab[
-      MyTab$incl == TRUE &
+     # MyTab$incl == TRUE &
         dplyr::between(MyTab$year, input$year[1], input$year[2]) &
         MyTab$country %in% input$country &
-        MyTab$study_design %in% input$study_design #&
-        #MyTab$herbivore_type %in% input$herbivore &
-        #MyTab$study_design %in% input$studydesign &
-       # MyTab$study_method %in% input$studymethod &
+        MyTab$study_design %in% input$study_design &
+        MyTab$diversity_contrast %in% input$diversity_contrast &
+        MyTab$measured_response_variable_new %in% input$measured_response_variable_new &
+        MyTab$change.long_f %in% input$change.long_f #&
       #  MyTab$experimental_design %in% input$expdesign
-      ]
+      ,]
     
   })
   
@@ -665,11 +679,13 @@ server <- function(input, output, session){
     
     ifelse(input$filteron == TRUE, dat <- datR(), dat <- MyTab)
     # Convert to spatial...
-    dat2 <- sp::SpatialPointsDataFrame(coords = dat[,c("coordinates_E","coordinates_N")], 
-                                       data = dat,
-                                       proj4string = CRS("+proj=longlat +datum=WGS84"))# +ellps=WGS84 +towgs84=0,0,0"))
+   # dat2 <- sp::SpatialPointsDataFrame(coords = dat[,c("coordinates_E","coordinates_N")], 
+    #                                   data = dat,
+    #                                   proj4string = CRS("+proj=longlat +datum=WGS84"))# +ellps=WGS84 +towgs84=0,0,0"))
     
-    dat2 <- sf::st_as_sf(dat2)
+    dat2<-st_as_sf(dat,coords=c("coordinates_E","coordinates_N"),crs=CRS("+proj=longlat +datum=WGS84"))
+    
+    #dat2 <- sf::st_as_sf(dat2)
     dat2 <- st_jitter(dat2, factor = 0.00001)
     
     #colpoints = brewer.pal(12,"Set3")
@@ -678,27 +694,39 @@ server <- function(input, output, session){
     # mapviewOptions(vector.palette = brewer.pal(12,"Set3"),
     #                 na.color = grey(0.8),
     #                layers.control.pos = "topright") 
+    #scale_range=c(-1,1)
+    limit <- max(abs(MyTab$yi_smd)) * c(-1, 1)
+    #limit<-c(0.5,-0.5)
+    #pal<-scale_fill_distiller(type = "div", limit = limit)
+    #palD <- colorNumeric("RdBu", domain = limit)
+    #color_palette <- rev(brewer.pal(11, "RdBu"))
+    minval<-min(MyTab$yi_smd)
+    maxval<-max(MyTab$yi_smd)
+    brks <- c(minval,-1,-0.5,-0.1,0,0.1,0.5,1,maxval)
+    #bias <- log(maxval/(maxval - minval))/log(0.5)
+    #color_palette_on_zero <- (colorRampPalette(brewer.pal(11, "RdBu")) )
+    #cols<-scale_fill_gradient2(MyTab$yi_smd)
+    colBin<-colorQuantile(palette="RdBu",domain=MyTab$yi_smd,n=5)
+    color_palette <- colorNumeric(
+      palette = colorRampPalette(c("blue", "white", "red"))(20),
+      domain = MyTab$yi_smd
+    )
     
-    m <- mapview::mapview(dat2,
+    m <- mapview::mapview(dat2,#["yi_smd"],
                           layer.name = "Evidence Point",
                           map.types = c("OpenStreetMap.Mapnik","Esri.WorldImagery"),
-                          cex = 5,#yi_smd,
+                          cex = 5,#dat2$yi_smd,
                           alpha.regions = 0.8,
-                          zcol = input$colour,
-                          #   na.color=grey(0.8,alpha=0.8),
+                          zcol =input$colour,
+                          #na.color=grey(0.8,alpha=0.8),
                           popup = leafpop::popupTable(dat2, 
                                                       row.numbers = F, feature.id = F,
-                                                      zcol = c("evidence_point_ID",
-                                                               "author_list2",
+                                                      zcol = c("article_ID",
+                                                               #"author_list",
                                                                "year",
                                                                "journal",
-                                                               "locality",
-                                                               "study_design",
-                                                               "experimental_design",
-                                                               "herbivore_type",
-                                                               "study_method",
-                                                               "effect_type")),
-                          #col.regions=colpoints,
+                                                               "study_design"
+                                                               )),
                           col.regions=pal,
                           color=pal,
                           legend=T)
