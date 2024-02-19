@@ -115,6 +115,7 @@ new_values_plants <- read_excel("CODING_database.xlsx", sheet = "plants") %>%
 write_excel_csv(new_values_plants, file = "new_values_plants.csv", col_names=TRUE)
 
 
+
 # we get the info on the HERBIVORE GROUPS separately because that requires some adjustments
 # for BODY SIZE GROUPS
 herbivore_groups <- raw.file_t %>% 
@@ -230,6 +231,10 @@ coded_data <- raw.file_t %>%
                 separate(study_ID, c("article_ID", "study"), "_") %>% 
                 mutate(article_ID = as.factor(article_ID),
                        study_ID = paste(article_ID, study, sep="_")) %>% 
+  
+                ## fix some coordinates. points in NAm that appeared in Russia
+                mutate(coordinates_E = case_when(article_ID %in% c(135, 191, 5851, 5886) ~ - coordinates_E,
+                                                 TRUE ~ coordinates_E)) %>% 
   
                 ## HERBIVORES
                 # add info on herbivore groups and functional groups that we calculated separately
