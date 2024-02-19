@@ -205,6 +205,7 @@ ui <- dashboardPage(
        "The full data set can be downloaded below.",tags$br(),
        "The systematic review is published as Barbero-Palacios et al. 2024 Environmental Evidence", tags$a(href="https://www.youtube.com/watch?v=dQw4w9WgXcQ","here"), " [PLACEHOLDER]" ,tags$br(),
        "The systematic review protocol is published as Barrio et al. 2022 Environmental Evidence and can be downloaded", tags$a(href="https://environmentalevidencejournal.biomedcentral.com/articles/10.1186/s13750-022-00257-z", "here"),tags$br(),
+       "Scripts and data are also available on the project ",tags$a(href="https://github.com/JamesDMSpeed/ArcticHerbivoreDiversitySystematicRev","GitHub repository"),tags$br(),
        "For further information contact", tags$a(href="mailto:James.Speed@ntnu.no", "James Speed"), "or",tags$a(href="mailto:isabel@lbhi.is",'Isabel Barrio'),tags$br(),
        "",tags$br(),
       ),
@@ -212,125 +213,7 @@ ui <- dashboardPage(
     
     
     
-    # # Lower Tabbox ------------------------------------------------------------
-    # 
-    # 
-    # tabBox(width = NULL, id = 'additionals',
-    #        
-    #        
-    #        # # . count cases -----------------------------------------------------------
-    #        # 
-    #        # 
-    #        # tabPanel('Count cases',
-    #        #          h5("This figure is responsive to the filters applied above. When filters are applied, the unfiltered data is shown as light gray bars.", tags$br(),
-    #        #             "Download Appendix below for full description of variables and coding"),
-    #        #          selectInput(inputId = "uni", 
-    #        #                      label = "Select variable",
-    #        #                      choices = varA,
-    #        #                      selected = c("country"),
-    #        #                      selectize = TRUE),
-    #        #          plotOutput('univ')),  
-    #        # 
-    #        # 
-    #        # # . trends ----------------------------------------------------------------
-    #        # 
-    #        # 
-    #        # tabPanel('Univariate continuous variables',
-    #        #          h5("This figure is responsive to the filters applied above", tags$br(),
-    #        #             "Download Appendix below for full description of variables and coding"),
-    #        #          
-    #        #          pickerInput(
-    #        #            inputId = "cont",
-    #        #            label = "Select variable",
-    #        #            choices = c("year",
-    #        #                        "coordinates_N",
-    #        #                        "coordinates_E",
-    #        #                        "first_year_of_study",
-    #        #                        "last_year_of_study",
-    #        #                        EEvars)),
-    #        #          plotOutput('trends')),
-    #        # 
-    #        # 
-    #        # 
-    #        # # . pairwise plots --------------------------------------------------------
-    #        # 
-    #        # 
-    #        # tabPanel('Pairwise Plots',
-    #        #          fluidRow(h5("The coloured circles are the evidence points 
-    #        #        identified in the systematic review. The grey 
-    #        #        background points show all possible values for each 
-    #        #        variable inside the study region", tags$br(),
-    #        #                      "Download Appendix below for full description of variables and coding")),
-    #        #          fluidRow(
-    #        #            column(width = 2,
-    #        #                   pickerInput(
-    #        #                     inputId = "var1",
-    #        #                     label = "X variable", 
-    #        #                     choices = EEvars,
-    #        #                     selected = "Annual_Mean_Temperature",
-    #        #                     options = list(size=10)
-    #        #                   )),
-    #        #            column(width = 2,
-    #        #                   pickerInput(
-    #        #                     inputId = "var2",
-    #        #                     label = "Y variable", 
-    #        #                     choices = EEvars,#[!EEvars %in% EEvars2],  # avoid weird error by removing 4 variables that don't have background points
-    #        #                     selected = "Annual_Precipitation",
-    #        #                     options = list(size=10)
-    #        #                   )),
-    #        #            column(width = 2,
-    #        #                   pickerInput(
-    #        #                     inputId = "var3",
-    #        #                     label = "Size variable", 
-    #        #                     choices = c("NULL" = 3, EEvars),
-    #        #                     selected = "ArcticHerbivore_Species.richness",
-    #        #                     options = list(size=10)
-    #        #                   )),
-    #        #            column(width=2,
-    #        #                   pickerInput(
-    #        #                     inputId = "var4",
-    #        #                     label = "Colour",
-    #        #                     options = list(size=10),
-    #        #                     choices = c("NULL", varA) #"extent_of_spatial_scale", "study_design", "experimental_design")
-    #        #                   )),
-    #        #            column(width=3,
-    #        #                   sliderInput('alpha', "Transparency of background points",
-    #        #                               min=0, max = 1, step = 0.1, value = 0.2)
-    #        #                   #switchInput(
-    #        #                   #  inputId = "var5",
-    #        #                   #  label = "Background points", 
-    #        #                   #  value = TRUE,
-    #        #                   #  labelWidth = "80px")
-    #        #            )),
-    #        #          fluidRow(     
-    #        #            plotOutput('space')),
-    #        #          fluidRow(
-    #        #            h5("For information on the variables and coding please see Appendix 3" ,tags$br(),
-    #        #               "For information about the climatic variables, 
-    #        #   go to: https://www.worldclim.org/data/bioclim.html"))),
-    #        # 
-    #        # 
-    #        # 
-    #        # . lookup table ----------------------------------------------------------
-    #        
-    #        tabPanel('Lookup table',
-    #                 selectInput('feature', 'Type the evidence point ID of the record you want to show. Get the unique ID by first clicking on the point on the map.', 
-    #                             choices = MyTab$evidence_point_ID, multiple=FALSE, selectize=TRUE),
-    #                 tableOutput('oneFeature')         
-    #        ),
-    #        
-    #        
-    #        # . responsive table ------------------------------------------------------
-    #        
-    #        
-    #        tabPanel('Responsive table',
-    #                 h5("This figure is responsive to the filters applied above"),
-    #                 
-    #                 DTOutput('responsiveTable'))
-    #        
-    # ),  # End panel box
-    # 
-    # 
+ 
     # Download ----------------------------------------------------------------
     
     
