@@ -38,234 +38,15 @@ MyTab<-MyTab[!is.na(MyTab$coordinates_E),]
 MyTab<-MyTab[!is.na(MyTab$yi_smd),]
 
 #Truncate for plotting
-MyTab$yi_smd[MyTab$yi_smd>5]<-5
-MyTab$yi_smd[MyTab$yi_smd< -5]<-(-5)
+MyTab$yi_smd[MyTab$yi_smd>6]<-6
+MyTab$yi_smd[MyTab$yi_smd< -6]<-(-6)
 
 #Rounding and truncating text for popups
 MyTab$EffectSize<-round(MyTab$yi_smd,1)
 MyTab$FirstAuthor<-sapply(strsplit(MyTab$author_list," "), `[`, 1)
 
 
-# # Add shortened versions of author lists, but first, change weird column name
-# if(!"author_list" %in% names(MyTab)) colnames(MyTab)[2] <- "author_list"
-# MyTab$author_list <- as.character(MyTab$author_list)
-# MyTab$language <- as.character(MyTab$language)
-# MyTab$author_list2 <- substr(MyTab$author_list, start = 1, stop = 20)
-# MyTab$author_list2 <-  ifelse(nchar(MyTab$author_list)>20, 
-#                               paste0(MyTab$author_list2, " [...]"),
-#                               MyTab$author_list2)
-# #names(MyTab)[names(MyTab)=='GPW']<-'HumanPopulationDensity'
-# #names(MyTab)[names(MyTab)=='Footprint']<-'Human.footprint'
-# 
-# # Fix alternate spelling
-# MyTab$language[MyTab$language == "English"] <- "english"
-# # Make a colums whihc is later used in the filter by species function
-# MyTab$incl <- NULL
-# # Scale species richness whihc is currently as proportions
-# MyTab$ArcticHerbivore_Species.richness <- MyTab$ArcticHerbivore_Species.richness*69
-# MyTab[,c("bio1", 
-#          "bio2",
-#          "bio5",
-#          "bio6",
-#          "bio7",
-#          "bio8",
-#          "bio9",
-#          "bio10",
-#          "bio11")] <- MyTab[,c("bio1", 
-#                                "bio2",
-#                                "bio5",
-#                                "bio6",
-#                                "bio7",
-#                                "bio8",
-#                                "bio9",
-#                                "bio10",
-#                                "bio11")]/10
-# 
-# MyTab <- dplyr::rename(MyTab,
-#                        "Annual_Mean_Temperature" = bio1,
-#                        "Mean_Diurnal_Range" = bio2,
-#                        "Isothermality" = bio3,
-#                        "Temperature_Seasonality" = bio4,
-#                        "Max_Temperature_of_Warmest_Month" = bio5,
-#                        "Min_Temperature_of_Coldest_Month" = bio6,
-#                        "Temperature_Annual_Range" = bio7,
-#                        "Mean_Temperature_of_Wettest_Quarter" = bio8,
-#                        "Mean_Temperature_of_Driest_Quarter" = bio9,
-#                        "Mean_Temperature_of_Warmest_Quarter" = bio10,
-#                        "Mean_Temperature_of_Coldest_Quarter" = bio11,
-#                        "Annual_Precipitation" = bio12,
-#                        "Precipitation_of_Wettest_Month" = bio13,
-#                        "Precipitation_of_Driest_Month" = bio14,
-#                        "Precipitation_Seasonality" = bio15,
-#                        "Precipitation_of_Wettest_Quarter" = bio16,
-#                        "Precipitation_of_Driest_Quarter" = bio17,
-#                        "Precipitation_of_Warmest_Quarter" = bio18,
-#                        "Precipitation_of_Coldest_Quarter" = bio19,
-#                        "Distance_to_Coast"=distance_from_coast,
-#                        "Distance_from_treeline"=north_of_treeline,
-#                        "Growing_season"=CurrentGrowingSeasonLength,
-#                        "Extent_of_recent_growing_season_change"=GrowingSeasonLength.trend,
-#                        "Extent_of_recent_warming"=Temperature.anomaly,
-#                        "Extent_of_recent_greening"=NDVI.trend,
-#                        "Productivity"=Current.NDVI,
-#                        "Human_population_density"=GPW,
-#                        "Human_footprint"=Footprint,
-# )
-# 
-# MyTab <- dplyr::rename(MyTab, "Elevation" = elevation_DEM)
-# 
-# # Make some variables continous even though they contain categories
-# r <- c("not available",  "not relevant",  "not reported")
-# MyTab$last_year_of_study <- MyTab$year_end
-# MyTab$last_year_of_study[MyTab$last_year_of_study %in% r] <- NA
-# MyTab$last_year_of_study <- as.numeric(MyTab$last_year_of_study)
-# 
-# MyTab$first_year_of_study <- MyTab$year_start
-# MyTab$first_year_of_study[MyTab$first_year_of_study %in% r] <- NA
-# MyTab$first_year_of_study <- as.numeric(MyTab$first_year_of_study)
-# 
-# # Reduce the number of levels in some variables
-# 
-# MyTab$extent_of_spatial_scale <- as.factor(MyTab$extent_of_spatial_scale)
-# 
-# MyTab$extent_of_spatial_scale <- plyr::revalue(MyTab$extent_of_spatial_scale,
-#                                                c("not reported"="not reported or nor relevant",
-#                                                  "not relevant"="not reported or nor relevant"#,
-#                                                  #  "from 100x100 km to 1000x1000 km (including 1000x1000 km)" = "from 100x100 km to 1000x1000 km",
-#                                                  # "from 10x10 km to 100x100 km (including 100x100 km)" = "from 10x10 km to 100x100 km",
-#                                                  # "from 1x1 km to 10x10 km (including 10x10 km)" = "from 1x1 km to 10x10 km"
-#                                                ))
-# MyTab$extent_of_spatial_scale <- factor(MyTab$extent_of_spatial_scale, 
-#                                         levels = c("1x1 km or less", 
-#                                                    "from 1x1 km to 10x10 km",
-#                                                    "from 100x100 km to 1000x1000 km",
-#                                                    "larger than 1000x1000 km",
-#                                                    "not reported or nor relevant"))
-# 
-# 
-# exttemp<-(as.numeric(as.character(MyTab$extent_of_temporal_scale)))
-# MyTab$extent_of_temporal_scale[exttemp==1]<-'1 year'
-# MyTab$extent_of_temporal_scale[exttemp>1  & exttemp<=5]<-'2-5 years'
-# MyTab$extent_of_temporal_scale[exttemp>5  & exttemp<=10]<-'5-10 years'
-# MyTab$extent_of_temporal_scale[exttemp>10 & exttemp<=20]<-'11-20 years'
-# MyTab$extent_of_temporal_scale[exttemp>20 & exttemp<=50]<-'21-50 years'
-# MyTab$extent_of_temporal_scale[exttemp>50 & exttemp<=100]<-'51-100 years'
-# MyTab$extent_of_temporal_scale[exttemp>100 ]<-'Over 100 years'
-# MyTab$extent_of_temporal_scale<-factor(MyTab$extent_of_temporal_scale,
-#                                        levels= c('1 year','2-5 years','5-10 years','11-20 years','21-50 years','51-100 years','Over 100 years'),
-#                                        ordered=T)
-# 
-# #Blank column for colouring points the same
-# MyTab$none<-rep('Evidence point',times=nrow(MyTab))
-# 
-# # Get total species list --------------------------------------------------
-# species  <- paste(MyTab$herbivore_identity, collapse = ",")
-# species2 <-     unlist(strsplit(species, ","))
-# species3 <- gsub(" ", "", species2, fixed = T)
-# species4 <- unique(species3)
-# rm(species, species2, species3)
-# 
-# 
-# # Climate space data ------------------------------------------------------
-# 
-# # Import dataset with the ranges of environmental variables within the study region
-# RangeofEcoContexts <- fread("RangeofEcoContexts.csv")
-# #RangeofEcoContexts <- fread("shiny/RangeofEcoContexts.csv")
-# # remove row and id columns
-# range <- select(RangeofEcoContexts,-V1)
-# # remove empty rows
-# range <- range[rowSums(is.na(range)) != ncol(range),]
-# rm(RangeofEcoContexts)
-# # scale variables
-# range[,c("bio1", 
-#          "bio2",
-#          "bio5",
-#          "bio6",
-#          "bio7",
-#          "bio8",
-#          "bio9",
-#          "bio10",
-#          "bio11")] <- range[,c("bio1", 
-#                                "bio2",
-#                                "bio5",
-#                                "bio6",
-#                                "bio7",
-#                                "bio8",
-#                                "bio9",
-#                                "bio10",
-#                                "bio11")]/10
-# # Rename columns
-# range <- dplyr::rename(range,
-#                        "Annual_Mean_Temperature" = bio1,
-#                        "Mean_Diurnal_Range" = bio2,
-#                        "Isothermality" = bio3,
-#                        "Temperature_Seasonality" = bio4,
-#                        "Max_Temperature_of_Warmest_Month" = bio5,
-#                        "Min_Temperature_of_Coldest_Month" = bio6,
-#                        "Temperature_Annual_Range" = bio7,
-#                        "Mean_Temperature_of_Wettest_Quarter" = bio8,
-#                        "Mean_Temperature_of_Driest_Quarter" = bio9,
-#                        "Mean_Temperature_of_Warmest_Quarter" = bio10,
-#                        "Mean_Temperature_of_Coldest_Quarter" = bio11,
-#                        "Annual_Precipitation" = bio12,
-#                        "Precipitation_of_Wettest_Month" = bio13,
-#                        "Precipitation_of_Driest_Month" = bio14,
-#                        "Precipitation_Seasonality" = bio15,
-#                        "Precipitation_of_Wettest_Quarter" = bio16,
-#                        "Precipitation_of_Driest_Quarter" = bio17,
-#                        "Precipitation_of_Warmest_Quarter" = bio18,
-#                        "Precipitation_of_Coldest_Quarter" = bio19,
-#                        "Distance_to_Coast"=DistancetoCoast,
-#                        "Distance_from_treeline"=NorthofTreeline,
-#                        "Growing_season"=CurrentGrowingSeasonLength,
-#                        "Extent_of_recent_growing_season_change"=GrowingSeasonLength.trend,
-#                        "Extent_of_recent_warming"=Temperature.anomaly,
-#                        "Extent_of_recent_greening"=NDVI.trend,
-#                        "Productivity"=Current.NDVI,
-#                        "Human_population_density"=HumanPopulationDensity,
-#                        "Human_footprint"=Human.footprint)
-# 
-# range$ArcticHerbivore_Species.richness <- range$ArcticHerbivore_Species.richness*69
-# 
-
-# List environmental and ecological variables -----------------------------
-# 
-# EEvars <- c(
-#   "Annual_Mean_Temperature",
-#   "Annual_Precipitation",
-#   "ArcticHerbivore_Functional.diversity",
-#   "ArcticHerbivore_Phylogenetic.diversity",
-#   "ArcticHerbivore_Species.richness",
-#   "Distance_to_Coast",
-#   "Distance_from_treeline",
-#   "Elevation",
-#   "Extent_of_recent_greening",
-#   "Extent_of_recent_growing_season_change",
-#   "Extent_of_recent_warming",
-#   "Growing_season",
-#   "Human_footprint",
-#   "Human_population_density",
-#   "Isothermality",
-#   "Max_Temperature_of_Warmest_Month",
-#   "Mean_Diurnal_Range",
-#   "Mean_Temperature_of_Coldest_Quarter",
-#   "Mean_Temperature_of_Driest_Quarter",
-#   "Mean_Temperature_of_Warmest_Quarter",
-#   "Mean_Temperature_of_Wettest_Quarter",
-#   "Min_Temperature_of_Coldest_Month",
-#   "Precipitation_of_Coldest_Quarter",
-#   "Precipitation_of_Driest_Month",
-#   "Precipitation_of_Driest_Quarter",
-#   "Precipitation_of_Warmest_Quarter",
-#   "Precipitation_of_Wettest_Month",
-#   "Precipitation_of_Wettest_Quarter",
-#   "Precipitation_Seasonality",
-#   "Productivity",
-#   "Temperature_Annual_Range",
-#   "Temperature_Seasonality"
-# )
-
-
+#List variables to play with
 
 varA <- c("year",
           "change.long_f",
@@ -273,41 +54,18 @@ varA <- c("year",
           "country",
           "study_design",
           "diversity_contrast"
-          
 )
 
-# those without background data
-#EEvars2 <- c("bbb" )
-
-# # Soil type
-# soil <- fread("SoilLegend.csv")
-# # make a new column (removing the period behind the name)
-# MyTab$soil_type <- soil$SoilType[match(MyTab$soil_type., soil$Letter)]
-# 
-# #Set factor levels for subzone
-# MyTab$Subzone<-as.factor(MyTab$Subzone)
-# #levels(MyTab$Subzone)<-c('A','B','C','D','E','Non-Arctic')#,'Non-Arctic')
-# 
-# #Factor levels for permafrost
-# #MyTab$permafrost[is.na(MyTab$permafrost)]<-'None'
-# MyTab$permafrost<-as.factor(MyTab$permafrost)
-# #levels(MyTab$permafrost)<-c('Continuous','Discontinuous','IsolatedPatches','Sporadic','None')
-# levels(MyTab$permafrost)<-c('IsolatedPatches','Sporadic','Discontinuous','Continuous')#,'None')
-# MyTab$permafrost<-factor(MyTab$permafrost,ordered=T,levels=c('IsolatedPatches','Sporadic','Discontinuous','Continuous'))
 
 # UI ----------------------------------------------------------------------
 
 ui <- dashboardPage(
   
-  
-  
-  dashboardHeader(title = "Arctic Herbivore Diversity Systematic Review",
+   dashboardHeader(title = "Arctic Herbivore Diversity Systematic Review",
                   titleWidth = 400),
   
   dashboardSidebar(disable = T),
-  
-  
-  
+ 
   dashboardBody(
     
     # Include custom CSS to add padding and auto-opacity to filtering-box
@@ -443,13 +201,13 @@ ui <- dashboardPage(
     
     # Description text and Active Filters ####
     h5("This is an interactive user interface of the systematic review of herbivore diversity impacts in the Arctic tundra.",tags$br(),
-       "Above, the spatial distribution of evidence points is shown. These can be filtered or coloured by a range of variables.",tags$br(),
-       "Below, individual variables can be summarised, or pairs of variables can be plotted against one another. The full data set can be downloaded below.",tags$br(),
-       "The systematic map is published as XXXXXXX", tags$a(href="https://environmentalevidencejournal.biomedcentral.com/articles/10.1186/s13750-021-00240-0","Environmental Evidence"), "- click to download" ,tags$a(href="https://environmentalevidencejournal.biomedcentral.com/track/pdf/10.1186/s13750-021-00240-0", "here"),tags$br(),
-       "The systematic map protocol is published as Barrio et al. 2022 Environmental Evidence and can be downloaded", tags$a(href="https://environmentalevidencejournal.biomedcentral.com/track/pdf/10.1186/s13750-018-0135-1.pdf", "here"),tags$br(),
+       "Above, the spatial distribution of evidence points is shown. These can be filtered  by a range of variables.",tags$br(),
+       "The full data set can be downloaded below.",tags$br(),
+       "The systematic review is published as Barbero-Palacios et al. 2024 Environmental Evidence", tags$a(href="https://www.youtube.com/watch?v=dQw4w9WgXcQ","here"), " [PLACEHOLDER]" ,tags$br(),
+       "The systematic review protocol is published as Barrio et al. 2022 Environmental Evidence and can be downloaded", tags$a(href="https://environmentalevidencejournal.biomedcentral.com/articles/10.1186/s13750-022-00257-z", "here"),tags$br(),
        "For further information contact", tags$a(href="mailto:James.Speed@ntnu.no", "James Speed"), "or",tags$a(href="mailto:isabel@lbhi.is",'Isabel Barrio'),tags$br(),
        "",tags$br(),
-       "Click to see which filters are active: "),
+      ),
     uiOutput('activeFilters'), br(),
     
     
@@ -578,9 +336,9 @@ ui <- dashboardPage(
     
     
     h4("Press the download button to download a speadsheet copy of the raw data:"),
-    downloadButton("downloadData", "DownloadData"),
-    h4("Press the download button to download the description of variables and coding:"),
-    downloadButton("downloadAppendix", "DownloadAppendix")
+    downloadButton("downloadData", "DownloadData")#,
+    #h4("Press the download button to download the description of variables and coding:"),
+    #downloadButton("downloadAppendix", "DownloadAppendix")
     
     
   ) # body
@@ -617,13 +375,7 @@ server <- function(input, output, session){
   # FILTERED DATASET -------------------------------------
   
   datR <- reactive({
-     # for(i in 1:nrow(MyTab)){
-     #   #MyTab$incl[i] <- any(input$species %in% gsub(" ", "", unlist(strsplit(MyTab$herbivore_identity[i], ","))))
-     #   MyTab$incl[i] <- any(input$country %in% gsub(" ", "", unlist(strsplit(MyTab$herbivore_identity[i], ","))))
-     #   }
-     
-    
-    MyTab[
+       MyTab[
      # MyTab$incl == TRUE &
         dplyr::between(MyTab$year, input$year[1], input$year[2]) &
         MyTab$country %in% input$country &
@@ -643,11 +395,6 @@ server <- function(input, output, session){
   
   
   # THE MAP ####
-#  MyTab$colorings<-ifelse(MyTab$yi_smd>0, log(MyTab$yi_smd),
-#                    ifelse(MyTab$yi_smd<0, -(log(abs(MyTab$yi_smd))), 0)) 
-  
-  
-  
   output$theMap <- renderLeaflet({
     
     ifelse(input$filteron == TRUE, dat <- datR(), dat <- MyTab)
@@ -655,28 +402,7 @@ server <- function(input, output, session){
     dat2<-st_as_sf(dat,coords=c("coordinates_E","coordinates_N"),crs=CRS("+proj=longlat +datum=WGS84"))
     dat2 <- st_jitter(dat2, factor = 0.00001)
     
-    #colpoints = brewer.pal(12,"Set3")
-    # pal = mapviewPalette("mapviewVectorColors")
-    # 
-    # limit <- max(abs(MyTab$yi_smd)) * c(-1, 1)
-     minval<-min(MyTab$yi_smd)
-     maxval<-max(MyTab$yi_smd)
-     brks <- c(minval,-1,-0.5,-0.1,0,0.1,0.5,1,maxval)
-     bias <- log(maxval/(maxval - minval))/log(0.5)
-     
-    # 
-    # limit2<-max(abs(MyTab$colorings))
-    # mycols<-colorNumeric("RdBu",domain=limit2)
-    # 
-    # color_palette_on_zero <- (colorRampPalette(brewer.pal(11, "RdBu")) )
-    # cols<-scale_fill_gradient2(MyTab$yi_smd,midpoint = 0)
-    # colBin<-colorQuantile(palette="RdBu",domain=MyTab$yi_smd,n=20)
-    color_palette <- colorBin(
-      palette = colorRampPalette(c("blue", "white", "red"))(20),
-      domain = c(-2,2)
-    )
-
-    pal <-  mapviewPalette("mapviewSpectralColors")
+   pal <-  mapviewPalette("mapviewSpectralColors")
     
     m <- mapview::mapview(dat2["yi_smd"],
                           layer.name = "Effect size",
@@ -703,25 +429,25 @@ server <- function(input, output, session){
   })
   
   
-  # Responsive Table ####
-  # output$responsiveTable <- 
-  #   renderDataTable({
-  #     ifelse(input$filteron == TRUE, dat <- datR(), dat <- MyTab)
-  #     DT::datatable(dat, 
-  #                   options = list(
-  #                     scrollX = TRUE,
-  #                     columnDefs = list(list(
-  #                       targets = "_all",
-  #                       render = JS(
-  #                         "function(data, type, row, meta) {",
-  #                         "return type === 'display' && data != null && data.length > 30 ?",
-  #                         "'<span title=\"' + data + '\">' + data.substr(0, 30) + '...</span>' : data;",
-  #                         "}")
-  #                     ))),
-  #                   class = "display")
-  #   })
-  # 
-  
+  #Responsive Table ####
+  output$responsiveTable <-
+    renderDataTable({
+      ifelse(input$filteron == TRUE, dat <- datR(), dat <- MyTab)
+      DT::datatable(dat,
+                    options = list(
+                      scrollX = TRUE,
+                      columnDefs = list(list(
+                        targets = "_all",
+                        render = JS(
+                          "function(data, type, row, meta) {",
+                          "return type === 'display' && data != null && data.length > 30 ?",
+                          "'<span title=\"' + data + '\">' + data.substr(0, 30) + '...</span>' : data;",
+                          "}")
+                      ))),
+                    class = "display")
+    })
+
+
   # # Counts ####
   # 
   # 
@@ -786,12 +512,12 @@ server <- function(input, output, session){
   
   
   
-  # # DOWNLOAD ####
-  # output$downloadData <- downloadHandler(
-  #   filename = function() {"ArcticHerbivorySystematicMap.csv"},
-  #   content = function(file) {
-  #     write.csv( MyTab, file,  row.names = FALSE)}
-  # )
+   # DOWNLOAD ####
+   output$downloadData <- downloadHandler(
+     filename = function() {"data_with_effect_sizes.csv"},
+     content = function(file) {
+     write.csv( MyTab, file,  row.names = FALSE)}
+  )
   # 
   # output$downloadAppendix<-downloadHandler(
   #   filename="Appendix 3.xlsx",
