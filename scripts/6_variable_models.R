@@ -114,7 +114,12 @@ dt_f <- dt %>% filter(!is.na(yi_smd)) %>%   # remove missing values (287 studies
             mutate(article_ID = as.character(article_ID), # make sure article_ID is character
                    # define study length
                    study_length = suppressWarnings(as.numeric(year_end))- 
-                                   suppressWarnings(as.numeric(year_start))) %>% 
+                                   suppressWarnings(as.numeric(year_start)),
+                   # re-code permafrost into an ordinal variable
+                   permafrost_ord = case_when(permafrost_D %in% c(1, 5) ~ 4,         # continuous
+                                              permafrost_D %in% c(2, 6, 14, 18) ~ 3, # discontinuous
+                                              permafrost_D %in% c(3, 7, 11, 15) ~ 2, # sporadic
+                                              permafrost_D %in% c(4, 16) ~ 1)) %>%   # isolated patches 
             # select relevant columns
             select("article_ID", "study_ID", 
                    "herbivore_fgr_ID_higher_diversity", "herbivore_fgr_ID_lower_diversity",
@@ -124,7 +129,7 @@ dt_f <- dt %>% filter(!is.na(yi_smd)) %>%   # remove missing values (287 studies
                    "overall_criterion", "error_type", "spatial_resolution", "year",
                    "sample_size_higher_diversity", "sample_size_lower_diversity", "study_length",
                    # include environmental context
-                   "permafrost_D", "habitat_type_D", "extent_of_recent_change", "recent_greening", 
+                   "permafrost_ord", "habitat_type_D", "extent_of_recent_change", "recent_greening", 
                    "recent_warming", "productivity", "soil_type_D", "bioclimatic_zone", 
                    "distance_from_coast", "growing_season", "precipitation", "temperature",
                    "distance_to_treeline", "elevation_DEM", "soil_chemistry", "soil_texture",
@@ -162,7 +167,7 @@ moderators <- dt_10_f %>%
                 select("elevation_DEM", "distance_to_treeline", "distance_from_coast", 
                        "bioclim_z", "temperature", "precipitation", "growing_season", 
                        "productivity", "recent_warming", "recent_greening",  
-                       "extent_of_recent_change","permafrost_D")
+                       "extent_of_recent_change","permafrost_ord")
 summary(moderators)
 
 ggcorrplot(cor(moderators, use = "complete.obs"), 
@@ -177,7 +182,7 @@ dt_10_f %>%  group_by(soil_texture) %>% summarize(n = n()) # there are a lot of 
 dt_10_f %>%  group_by(soil_moisture) %>% summarize(n = n()) # there are a lot of missing values
 dt_10_f %>%  group_by(soil_type) %>% summarize(n = n()) %>% print(n = Inf) # there are a lot of missing values
 dt_10_f %>%  group_by(soil_type_D) %>% summarize(n = n()) # we can include this :)
-  ggplot(dt_10_f) + geom_boxplot(aes(soil_type_D, permafrost_D), na.rm = T)
+  ggplot(dt_10_f) + geom_boxplot(aes(soil_type_D, permafrost_ord), na.rm = T)
 dt_10_f %>%  group_by(permafrost) %>% summarize(n = n()) # there are a lot of missing values
 dt_10_f %>%  group_by(habitat_type) %>% summarize(n = n()) # we can include this :)
 dt_10_f %>%  group_by(habitat_type_D) %>% summarize(n = n()) # there are a lot of missing values
@@ -191,7 +196,7 @@ model_guide <- CJ(eco_response = unique(dt_10_f$MA.value),
                   variable = c("change_f -1", "herb_fgr_change",
                                "ess.se", "year.c", "study_length", "overall_criterion -1", 
                                "error_type -1", "spatial_resolution -1", "exclusion -1",
-                               "permafrost_D", "recent_greening", 
+                               "permafrost_ord", "recent_greening", 
                                "recent_warming", "soil_type_D -1", "distance_from_coast", 
                                "precipitation", "temperature", "distance_to_treeline", 
                                "elevation_DEM", "habitat_type -1")) %>% 
@@ -298,7 +303,7 @@ model.results <- model.results[!is.na(model.results$eco_response)]
 model.results$row_number <- c(1:nrow(model.results)) 
 
 sig <- model.results[pval < 0.05,] # note that this is the anova/likelihood ratio test
-sig # these are the models where adding the variable improved the model (28)
+sig # these are the models where adding the variable improved the model (31)
 
 fwrite(model.results, "builds/model_results/variable_model_results.csv")
 
@@ -332,8 +337,7 @@ model_guide_multi <- CJ(eco_response = unique(sig$eco_response)) %>%
                                    "yi_smd ~ error_type -1",                                 # plant fitness
                                    "yi_smd ~ change_f + error_type + exclusion + 
                                       habitat_type + overall_criterion + study_length -1",   # plant height
-                                   "yi_smd ~ permafrost_D + recent_warming + temperature",   # plant productivity
-                                   "yi_smd ~ permafrost_D",                                  # plant species richness
+                                   "yi_smd ~ permafrost_ord + recent_warming + temperature", # plant productivity
                                    "yi_smd ~ year.c",                                        # plant structure
                                    "yi_smd ~ error_type -1",                                 # soil C labile
                                    "yi_smd ~ error_type + year.c -1"))                       # soil moisture
@@ -512,7 +516,8 @@ change_plantCN <- ggplot() +
               scale_x_discrete(labels = c("inv" = "Inv", "F1" = "F1", "F2" = "F2", 
                                           "F3" = "F3", "F1+F2", "F1_F3" = "F1+F3", 
                                           "F2_F3" = "F2+F3", "F1_F2_F3" = "F1+F2+F3")) +
-              scale_fill_gradient2(low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
+              scale_fill_gradient2(name = "effect size",
+                                   low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
                   midpoint = 0, space = "Lab") +
               geom_hline(yintercept = 0, linetype = "dashed") +
               # add the model results
@@ -568,7 +573,8 @@ exclusion_plantCN <- ggplot() +
                           aes(x = exclusion,  
                               y = yi_smd, size = 1/vi_smd, fill = yi_smd), 
                           shape = 21, colour= "lightgrey", stroke = 0, width = 0.1, alpha = 0.9) +
-              scale_fill_gradient2(low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
+              scale_fill_gradient2(name = "effect size",
+                                   low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
                   midpoint = 0, space = "Lab") +
               geom_hline(yintercept = 0, linetype = "dashed") +
               # add the model results
@@ -630,7 +636,8 @@ bias_plantC <- ggplot() +
               scale_x_discrete(labels = c("Overall low risk of bias" = "low", 
                                           "Overall medium risk of bias" = "medium",
                                           "Overall high risk of bias" = "high")) +
-              scale_fill_gradient2(low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
+              scale_fill_gradient2(name = "effect size",
+                                   low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
                   midpoint = 0, space = "Lab") +
               geom_hline(yintercept = 0, linetype = "dashed") +
               # add the model results
@@ -734,7 +741,8 @@ change_graminoids <- ggplot() +
               scale_x_discrete(labels = c("inv" = "Inv", "F1" = "F1", "F2" = "F2", 
                                           "F3" = "F3", "F1+F2", "F1_F3" = "F1+F3", 
                                           "F2_F3" = "F2+F3", "F1_F2_F3" = "F1+F2+F3")) +
-              scale_fill_gradient2(low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
+              scale_fill_gradient2(name = "effect size",
+                                   low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
                   midpoint = 0, space = "Lab") +
               geom_hline(yintercept = 0, linetype = "dashed") +
               # add the model results
@@ -796,7 +804,8 @@ change_lichens <- ggplot() +
               scale_x_discrete(labels = c("inv" = "Inv", "F1" = "F1", "F2" = "F2", 
                                           "F3" = "F3", "F1+F2", "F1_F3" = "F1+F3", 
                                           "F2_F3" = "F2+F3", "F1_F2_F3" = "F1+F2+F3")) +
-              scale_fill_gradient2(low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
+              scale_fill_gradient2(name = "effect size",
+                                   low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
                   midpoint = 0, space = "Lab") +
               geom_hline(yintercept = 0, linetype = "dashed") +
               # add the model results
@@ -850,7 +859,8 @@ error_tallshrubs <- ggplot() +
                                                                 "IQR", "estimated")),  
                               y = yi_smd, size = 1/vi_smd, fill = yi_smd), 
                           shape = 21, colour= "lightgrey", stroke = 0, width = 0.1, alpha = 0.9) +
-              scale_fill_gradient2(low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
+              scale_fill_gradient2(name = "effect size",
+                                   low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
                   midpoint = 0, space = "Lab") +
               geom_hline(yintercept = 0, linetype = "dashed") +
               # add the model results
@@ -913,7 +923,8 @@ hab_diversity <- ggplot() +
                                           "erect-shrub tundra (shrubs >40 cm)" = "tall shrub",
                                           "wetland" = "wetland", "other" = "other", 
                                           "not reported" = "not reported")) +
-              scale_fill_gradient2(low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
+              scale_fill_gradient2(name = "effect size", 
+                                   low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
                   midpoint = 0, space = "Lab") +
               geom_hline(yintercept = 0, linetype = "dashed") +
               # add the model results
@@ -965,7 +976,8 @@ error_fitness <- ggplot() +
                                                                 "IQR", "estimated")),  
                               y = yi_smd, size = 1/vi_smd, fill = yi_smd), 
                           shape = 21, colour= "lightgrey", stroke = 0, width = 0.1, alpha = 0.9) +
-              scale_fill_gradient2(low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
+              scale_fill_gradient2(name = "effect size",
+                                   low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
                   midpoint = 0, space = "Lab") +
               geom_hline(yintercept = 0, linetype = "dashed") +
               # add the model results
@@ -1079,7 +1091,8 @@ length_height <- ggplot() +
                    y = "Effect size (Hedges g)", fill = "Effect size") +
               ylim(-6, 6) +
               guides(size = FALSE) +
-              scale_colour_gradient2(low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
+              scale_colour_gradient2(name = "effect size",
+                                     low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
                   midpoint = 0, space = "Lab") +
               theme_systrev() + 
                 theme(legend.position = "none") 
@@ -1143,7 +1156,8 @@ change_plantheight <- ggplot() +
               scale_x_discrete(labels = c("inv" = "Inv", "F1" = "F1", "F2" = "F2", 
                                           "F3" = "F3", "F1+F2", "F1_F3" = "F1+F3", 
                                           "F2_F3" = "F2+F3", "F1_F2_F3" = "F1+F2+F3")) +
-              scale_fill_gradient2(low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
+              scale_fill_gradient2(name = "effect size",
+                                   low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
                   midpoint = 0, space = "Lab") +
               geom_hline(yintercept = 0, linetype = "dashed") +
               # add the model results
@@ -1227,7 +1241,8 @@ error_plantheight <- ggplot() +
                                                                 "IQR", "estimated")),  
                               y = yi_smd, size = 1/vi_smd, fill = yi_smd), 
                           shape = 21, colour= "lightgrey", stroke = 0, width = 0.1, alpha = 0.9) +
-              scale_fill_gradient2(low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
+              scale_fill_gradient2(name = "effect size",
+                                   low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
                   midpoint = 0, space = "Lab") +
               geom_hline(yintercept = 0, linetype = "dashed") +
               # add the model results
@@ -1256,47 +1271,11 @@ print(error_plantheight) # print plot to screen
 
 ## 3.11 plant productivity -----------------------------------------------------
 m <- model_list[["plant_productivity"]]
-  summary(m) # permafrost has a significant effect
-data <- dt_10_f[MA.value == "plant_productivity", ]
-
-#### permafrost ----------------------------------------------------------------
-newgrid <- CJ(permafrost_D = seq(min(data$permafrost_D, na.rm = TRUE), 
-                                 max(data$permafrost_D, na.rm = TRUE), by = .1),
-              temperature = mean(data$temperature),       # keep temperature constant
-              recent_warming = mean(data$recent_warming)) # keep recent warming constant
-pred2 <- rma_predictions(m, newgrid)
-
-permafrost_plantprod <- ggplot() +
-              geom_jitter(data = subset(data, abs(yi_smd) < 6),
-                          aes(x = permafrost_D, y = yi_smd, size = 1/vi_smd, 
-                              color = yi_smd), width = 0.1, alpha = 0.5) +
-              geom_hline(yintercept = 0, linetype = "dashed") +
-              # plot predicted values for dwarf shrub tundra
-              geom_ribbon(data = pred2, 
-                          aes(x = permafrost_D, ymin = ci.lb, ymax = ci.ub), 
-                          fill = "grey90", alpha = 0.7) +
-              geom_line(data = pred2, 
-                        aes(x = permafrost_D, y = pred), color = "black") +
-              labs(title = "Plant productivity", x = "Permafrost (%)", 
-                   y = "Effect size (Hedges g)", fill = "Effect size") +
-              ylim(-6, 6) +
-              guides(size = FALSE) +
-              scale_colour_gradient2(low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
-                  midpoint = 0, space = "Lab") +
-              theme_systrev() + 
-                theme(legend.position = "none") 
-  print(permafrost_plantprod)  # print plot to screen
+  summary(m) # none of the variables had a significant effect
 
   
 
-## 3.12 plant species richness -------------------------------------------------
-m <- model_list[["plant_species_richness"]]
-  summary(m) # permafrost does NOT have a significant effect
-data <- dt_10_f[MA.value == "plant_species_richness", ]
-
-
-
-## 3.13 plant structure ----------------------------------------------------------
+## 3.12 plant structure ----------------------------------------------------------
 m <- model_list[["plant_structure"]]
   summary(m) # year.c has a significant effect
 data <- dt_10_f[MA.value == "plant_structure", ]
@@ -1325,7 +1304,8 @@ year_plantstruct <- ggplot() +
                    y = "Effect size (Hedges g)", fill = "Effect size") +
               ylim(-6, 6) +
               guides(size = FALSE) +
-              scale_colour_gradient2(low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
+              scale_colour_gradient2(name = "effect size",
+                                     low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
                   midpoint = 0, space = "Lab") +
               theme_systrev() + 
                 theme(legend.position = "none") 
@@ -1333,14 +1313,14 @@ year_plantstruct <- ggplot() +
   
   
 
-## 3.14 soil C labile ---------------------------------------------------------
+## 3.13 soil C labile ---------------------------------------------------------
 m <- model_list[["soil_C_labile"]]
   summary(m) # error type does NOT have a significant effect
 data <- dt_10_f[MA.value == "soil_C_labile", ]
 
 
 
-## 3.15 soil moisture -----------------------------------------------------
+## 3.14 soil moisture -----------------------------------------------------
 m <- model_list[["soil_moisture"]]
   summary(m) # year and error type have a significant effect
 data <- dt_10_f[MA.value == "soil_moisture", ]
@@ -1387,7 +1367,8 @@ year_soilmoist <- ggplot() +
                    y = "Effect size (Hedges g)", fill = "Effect size") +
               ylim(-6, 6) +
               guides(size = FALSE) +
-              scale_colour_gradient2(low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
+              scale_colour_gradient2(name = "effect size",
+                                     low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
                   midpoint = 0, space = "Lab") +
               theme_systrev() + 
                 theme(legend.position = "none") 
@@ -1415,7 +1396,8 @@ error_soilmoist <- ggplot() +
                                                                 "IQR", "estimated")),  
                               y = yi_smd, size = 1/vi_smd, fill = yi_smd), 
                           shape = 21, colour= "lightgrey", stroke = 0, width = 0.1, alpha = 0.9) +
-              scale_fill_gradient2(low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
+              scale_fill_gradient2(name = "effect size",
+                                   low = "#006699FF", mid = "#B3B8B3FF", high = "#B35900FF",
                   midpoint = 0, space = "Lab") +
               geom_hline(yintercept = 0, linetype = "dashed") +
               # add the model results
@@ -1486,9 +1468,8 @@ ggsave(fig7, file = "figures/Fig7.png", dpi = 600)
 
 #### Figure 8. ecological moderators ---------------------------------------
 # subset of outcome variables for which habitat_type and permafrost were significant in multi-moderator models
-fig8 <- ggarrange(hab_diversity + ggtitle("a. Plant diversity"), 
-          permafrost_plantprod + ggtitle("b. Plant productivity"), 
-          ncol = 2, nrow = 1, 
+fig8 <- ggarrange(hab_diversity + ggtitle("Plant diversity"), 
+          ncol = 1, nrow = 1, 
           legend = "bottom", common.legend = T)
 fig8
 
